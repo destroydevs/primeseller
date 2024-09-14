@@ -1,0 +1,12 @@
+name: PrimeSeller
+version: '2.3.6'
+main: ru.spigotmc.destroy.primeseller.PrimeSeller
+api-version: 1.13
+softdepend: [ Vault, PlaceholderAPI ]
+commands:
+  seller:
+    aliases:
+      - 'sell'
+  PrimeSeller:
+    aliases:
+      - 'psell'

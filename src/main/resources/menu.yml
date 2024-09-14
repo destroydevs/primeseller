@@ -1,0 +1,111 @@
+title: 'Скупщик предметов' # тайтл в меню
+size: 54 # кол-во слотов
+
+exit:
+  material: RED_STAINED_GLASS_PANE
+  model-data: 0
+  name: '#ff4141Закрыть'
+  commands:
+    - '[close]'
+    - '[cmd] menu'
+  slots: # счет с 0
+    - 45
+    - 53
+
+countdown:
+  material: 'basehead-eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzZjMGQwNDU5YzY3ZjJiZTgyZmJlNTQwNmFiOGQxMzc4ZGExZjI4ZjdhM2Y4MmYxZGZjNDc2MTVhOTU1YTcifX19'
+  model-data: 0
+  name: '#ddddddДо след обновления:'
+  lore:
+    - ''
+    - '#ddddddОбновление лимитированного скупщика через:'
+    - '#eaff43> #7348dd%lim-time% &7|&8 %lim-time-format%'
+    - ''
+    - '#ddddddОбновление скупщика без лимита через:'
+    - '#eaff43> #7348dd%unlim-time% &7|&8 %unlim-time-format%'
+    - ''
+  slots:
+    - 4
+
+lim-items:
+  lore:
+    - ''
+    - '#ddddddЦена за #a9e3ffх1: #53fb31$%price-x1% #b9b9b9(ЛКМ)'
+    - '#ddddddЦена за #a9e3ffх64: #53fb31$%price-x64% #b9b9b9(ПКМ)'
+    - ''
+    - '#ddddddЦена за #a9e3ffвсё: #53fb31$%price-all% #b9b9b9(СКМ)'
+    - ''
+    - '#ddddddПредметы в этой строке #ff4141ограничены&f!'
+    - '#ddddddПродано из общ. кол-ва: #7348dd%sell% &8из #7348dd%max%'
+    - '#ddddddПродано таких предметов: #7348dd%sell-items% &8из #7348dd%max-items%'
+  slots: # счет с 0
+    - 9
+    - 10
+    - 11
+    - 12
+    - 18
+    - 19
+    - 20
+    - 21
+    - 27
+    - 28
+    - 29
+    - 30
+    - 36
+    - 37
+    - 38
+    - 39
+
+unlim-items:
+  lore:
+    - ''
+    - '#ddddddЦена за #a9e3ffх1: #53fb31$%price-x1% &7(ЛКМ)'
+    - '#ddddddЦена за #a9e3ffх64: #53fb31$%price-x64% &7(ПКМ)'
+    - ''
+    - '#ddddddЦена за #a9e3ffвсё: #53fb31$%price-all% &7(СКМ)'
+    - ''
+    - '#ddddddПредметы &aне ограничены&f!'
+    - '#ff4141ВНИМАНИЕ! #ddddddЦена занижена!'
+  slots: # счет с 0
+    - 14
+    - 15
+    - 16
+    - 17
+    - 23
+    - 24
+    - 25
+    - 26
+    - 32
+    - 33
+    - 34
+    - 35
+    - 41
+    - 42
+    - 43
+    - 44
+
+divider:
+  your_name:
+    material: BLACK_STAINED_GLASS_PANE
+    model-data: 0
+    name: '&7'
+    slots: # счет с 0
+      - 0
+      - 1
+      - 2
+      - 3
+      - 5
+      - 6
+      - 7
+      - 8
+      - 13
+      - 22
+      - 31
+      - 40
+      - 49
+      - 48
+      - 47
+      - 46
+      - 50
+      - 51
+      - 52
