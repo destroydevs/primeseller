@@ -1,6 +1,15 @@
 title: 'Скупщик предметов' # тайтл в меню
 size: 54 # кол-во слотов
 
+sell-inventory:
+  material: CHEST
+  model-data: 0
+  name: '&aПродать инвентарь'
+  lore:
+    - ''
+  slots: # счет с 0
+    - 49
+
 exit:
   material: RED_STAINED_GLASS_PANE
   model-data: 0

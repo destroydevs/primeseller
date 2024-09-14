@@ -41,11 +41,8 @@ public class SellerListener implements Listener {
                 return;
             }
             MapBase sql = new MapBase();
-            if (e.getSlot() == 0) {
-                sellAllItems(sql,e,player);
-                return;
-            }
             player.updateInventory();
+            handleSellInvSlots(e,player,sql);
             handleExitSlots(e, player);
             handleCountdownSlots(e, player);
 
@@ -77,6 +74,15 @@ public class SellerListener implements Listener {
                         player.closeInventory();
                     }
                 }
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    private void handleSellInvSlots(InventoryClickEvent e, Player player,MapBase sql) {
+        for (Integer i : Menu.getConfig().getIntegerList("sell-inventory.slots")) {
+            if (e.getSlot() == i) {
+                sellAllItems(sql, e, player);
                 e.setCancelled(true);
             }
         }
@@ -155,7 +161,7 @@ public class SellerListener implements Listener {
 
                 if (item.isSimilar(itemStack)) {
                     int slot = d.getKey();
-                    int count = Util.calc(player,item);
+                    int count = Util.calc(player,itemStack);
                     if (count <= 0) {
                         continue;
                     }
@@ -182,8 +188,8 @@ public class SellerListener implements Listener {
 
                     amount+=count;
                     price += Double.parseDouble(format.format(sql.getPrice(slot) * count).replace(",", "."));
-                    item.setAmount(count);
-                    player.getInventory().removeItem(item);
+                    itemStack.setAmount(count);
+                    player.getInventory().removeItem(itemStack);
                     Understating.takePrice(slot, count);
                 }
 
@@ -191,7 +197,7 @@ public class SellerListener implements Listener {
 
         }
         Chat.sendMessage(e.getWhoClicked(), Config.getConfig().getString("messages.sell-inventory")
-                .replace("%price%", String.valueOf(price))
+                .replace("%price%", format.format(price).replace(",", "."))
                 .replace("%amount%", "x" + amount));
     }
 

@@ -121,6 +121,25 @@ public class Util {
             item.setItemMeta(meta);
             inv.setItem(i, item);
         }
+        for (Integer i : Menu.getConfig().getIntegerList("sell-inventory.slots")) {
+            String items = Menu.getConfig().getString("sell-inventory.material");
+            List<String> lore = Menu.getConfig().getStringList("sell-inventory.lore");
+            int modelId = Menu.getConfig().getInt("sell-inventory.model-data",0);
+            ItemStack item;
+            try {
+                item = new ItemStack(Material.valueOf(items));
+            } catch (IllegalArgumentException e) {
+                Bukkit.getLogger().warning("Неизвестный предмет: " + items);
+                break;
+            }
+            lore.forEach(Chat::color);
+            ItemMeta meta = item.getItemMeta();
+            meta.setLore(lore);
+            meta.setCustomModelData(modelId);
+            meta.setDisplayName(Chat.color(Menu.getConfig().getString("sell-inventory.name")));
+            item.setItemMeta(meta);
+            inv.setItem(i, item);
+        }
         for (Integer i : Menu.getConfig().getIntegerList("countdown.slots")) {
             String name = Menu.getConfig().getString("countdown.material");
             int modelId = Menu.getConfig().getInt("countdown.model-data",0);
