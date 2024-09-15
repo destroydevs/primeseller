@@ -23,7 +23,7 @@ public class Util {
 
     public static boolean update = false;
     
-    private static final DecimalFormat format = new DecimalFormat("##.#");
+    private static final DecimalFormat format = new DecimalFormat("##.##");
 
     public static HashMap<UUID, Integer> playerSellItems = new HashMap<>();
 

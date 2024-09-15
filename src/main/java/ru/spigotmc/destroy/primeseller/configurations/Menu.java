@@ -5,6 +5,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import ru.spigotmc.destroy.primeseller.locale.ConfigurationCreator;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,7 @@ public class Menu {
     public void loadMenuYaml(Plugin main) {
         file = new File(main.getDataFolder(), "menu.yml");
         if (!file.exists()) {
-            main.saveResource("menu.yml", true);
+            ConfigurationCreator.createConfig("menu.yml",main);
         }
         config = YamlConfiguration.loadConfiguration(file);
     }

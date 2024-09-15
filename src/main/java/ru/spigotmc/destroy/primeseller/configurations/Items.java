@@ -14,7 +14,7 @@ import java.text.DecimalFormat;
 
 public class Items {
 
-    private static DecimalFormat format = new DecimalFormat("##.#");
+    private static DecimalFormat format = new DecimalFormat("##.##");
     private static File file;
     private static FileConfiguration config;
 

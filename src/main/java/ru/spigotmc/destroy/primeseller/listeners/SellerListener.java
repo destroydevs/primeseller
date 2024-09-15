@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class SellerListener implements Listener {
 
-    private final DecimalFormat format = new DecimalFormat("##.#");
+    private final DecimalFormat format = new DecimalFormat("##.##");
 
     public SellerListener(PrimeSeller main) {
         Bukkit.getPluginManager().registerEvents(this, main);

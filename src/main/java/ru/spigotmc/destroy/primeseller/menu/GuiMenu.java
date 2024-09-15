@@ -33,9 +33,10 @@ public class GuiMenu {
         try {
             Util.fillInventory(inv, countdown, unlim, lim, p);
         } catch (NullPointerException e) {
-            GuiMenu.open(p, main);
+            p.sendMessage("Предметы скупщика всё ещё загружаются... Подождите.");
             return;
         }
+
         if(!tasks.containsKey(p.getUniqueId())) {
             tasks.put(p.getUniqueId(), Bukkit.getScheduler().runTaskTimer(main, () -> {
                 Bukkit.getScheduler().runTaskTimer(main, ()-> {
@@ -43,7 +44,6 @@ public class GuiMenu {
                         try {
                             Util.fillInventory(inv, countdown, unlim, lim, p);
                         } catch (NullPointerException e) {
-                            GuiMenu.open(p, main);
                             return;
                         }
                         Util.update = false;
@@ -94,7 +94,6 @@ public class GuiMenu {
         try {
             Util.fillInventory(inv, countdown, unlim, lim, p);
         } catch (NullPointerException e) {
-            update(p, inv);
             return;
         }
         p.updateInventory();

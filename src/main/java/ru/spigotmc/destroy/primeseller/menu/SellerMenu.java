@@ -8,6 +8,7 @@ import ru.spigotmc.destroy.primeseller.configurations.database.MapBase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SellerMenu {
@@ -31,9 +32,9 @@ public class SellerMenu {
             int lim = Items.getConfig().getInt("limited.limit-per-items");
             double price = generate(min, max);
             try {
-                MapBase.saveMaterial(new ItemStack(Material.valueOf(item)), unlimSlots.get(i), price, lim, false);
+                MapBase.saveMaterial(new ItemStack(Material.valueOf(item.toUpperCase(Locale.ENGLISH))), unlimSlots.get(i), price, lim, false);
             } catch (IllegalArgumentException e) {
-                ItemStack itemStack = Items.getConfig().getItemStack("limited.items."+item+".item");
+                ItemStack itemStack = Items.getConfig().getItemStack("unlimited.items."+item+".item");
                 MapBase.saveMaterial(itemStack, unlimSlots.get(i), price, lim, false);
             }
             randomItems.remove(random);

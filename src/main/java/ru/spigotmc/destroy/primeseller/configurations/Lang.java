@@ -5,25 +5,18 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import ru.spigotmc.destroy.primeseller.locale.ConfigurationCreator;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
-public class Config {
-
+public class Lang {
     private static File file;
     private static FileConfiguration config;
 
-    public void loadConfigYaml(Plugin main) {
-        file = new File(main.getDataFolder(), "config.yml");
+    public void loadYaml(Plugin main) {
+        file = new File(main.getDataFolder(), "lang.yml");
         if (!file.exists()) {
-            ConfigurationCreator.createConfig("config.yml",main);
+            main.saveResource("lang.yml", true);
         }
         config = YamlConfiguration.loadConfiguration(file);
     }
@@ -32,11 +25,11 @@ public class Config {
         try {
             config.load(file);
         } catch (IOException | InvalidConfigurationException e) {
-            Bukkit.getLogger().warning("Не удалось загрузить config.yml!");
+            Bukkit.getLogger().warning("Не удалось загрузить lang.yml!");
         }
     }
 
-    public static FileConfiguration getConfig() {
-        return config;
+    public static String getLocale() {
+        return config.getString("language");
     }
 }
