@@ -196,6 +196,7 @@ public class SellerListener implements Listener {
             }
 
         }
+        Eco.getEconomy().depositPlayer(player, price);
         Chat.sendMessage(e.getWhoClicked(), Config.getConfig().getString("messages.sell-inventory")
                 .replace("%price%", format.format(price).replace(",", "."))
                 .replace("%amount%", "x" + amount));
