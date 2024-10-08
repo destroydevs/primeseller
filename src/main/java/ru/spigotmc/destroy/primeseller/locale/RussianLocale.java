@@ -157,6 +157,10 @@ public class RussianLocale {
         @Comment(comment = "продажа на среднюю кнопку мыши. Если false продаётся через ШИФТ+ЛКМ")
         public boolean middleClickSellAll = true;
 
+        @Path(path = "inv-sell-priority")
+        @Comment(comment = "Приоритет продажи инвентаря скупщику. UNLIMITED - сначала нелимитированные, LIMITED - сначала лимитированные.", type = CommentType.ABOVE)
+        public String prioritySellInv = "LIMITED";
+
         @Path(path = "enable-permission")
         @Comment(comment = "включить ли право на использование команды? primeseller.open")
         public boolean enablePermission = false;
