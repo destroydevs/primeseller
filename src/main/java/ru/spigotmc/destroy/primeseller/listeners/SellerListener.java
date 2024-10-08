@@ -21,6 +21,7 @@ import ru.spigotmc.destroy.primeseller.util.Understating;
 import ru.spigotmc.destroy.primeseller.util.Util;
 
 import java.text.DecimalFormat;
+import java.util.Locale;
 import java.util.Map;
 
 public class SellerListener implements Listener {
@@ -152,21 +153,78 @@ public class SellerListener implements Listener {
     private void sellAllItems(MapBase sql, InventoryClickEvent e, Player player) {
         double price = 0;
         int amount = 0;
+
+        String type = Config.getConfig().getString("inv-sell-priority", "LIMITED").toUpperCase(Locale.ENGLISH);
+
         for (ItemStack item : player.getInventory().getContents()) {
             if (item == null || item.getType() == Material.AIR) {
                 continue;
             }
+
+            if (type.equals("LIMITED")) {
+                sellLimited(player,sql,price,amount);
+                sellUnLimited(player,sql,price,amount);
+                return;
+            }
+
+
+            if (type.equals("UNLIMITED")) {
+                sellUnLimited(player,sql,price,amount);
+                sellLimited(player,sql,price,amount);
+            }
+        }
+
+        Eco.getEconomy().depositPlayer(player, price);
+        Chat.sendMessage(e.getWhoClicked(), Config.getConfig().getString("messages.sell-inventory")
+                .replace("%price%", format.format(price).replace(",", "."))
+                .replace("%amount%", "x" + amount));
+    }
+
+    private void sellUnLimited(Player player, MapBase sql, double price, int amount) {
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || item.getType() == Material.AIR) {
+                continue;
+            }
+
             for (Map.Entry<Integer, SellItem> d : MapBase.database.entrySet()) {
-                ItemStack itemStack = d.getValue().getItem().clone();
+                if (!d.getValue().isLimited()) {
+                    ItemStack itemStack = d.getValue().getItem().clone();
 
-                if (item.isSimilar(itemStack)) {
-                    int slot = d.getKey();
-                    int count = Util.calc(player,itemStack);
-                    if (count <= 0) {
-                        continue;
+                    if (item.isSimilar(itemStack)) {
+                        int slot = d.getKey();
+                        int count = Util.calc(player, itemStack);
+                        if (count <= 0) {
+                            continue;
+                        }
+
+                        amount += count;
+                        price += Double.parseDouble(format.format(sql.getPrice(slot) * count).replace(",", "."));
+                        itemStack.setAmount(count);
+                        player.getInventory().removeItem(itemStack);
+                        Understating.takePrice(slot, count);
                     }
+                }
+            }
+        }
+    }
 
-                    if (sql.isLimited(slot)) {
+    private void sellLimited(Player player, MapBase sql, double price, int amount) {
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || item.getType() == Material.AIR) {
+                continue;
+            }
+
+            for (Map.Entry<Integer, SellItem> d : MapBase.database.entrySet()) {
+                if (d.getValue().isLimited()) {
+                    ItemStack itemStack = d.getValue().getItem().clone();
+
+                    if (item.isSimilar(itemStack)) {
+                        int slot = d.getKey();
+                        int count = Util.calc(player, itemStack);
+                        if (count <= 0) {
+                            continue;
+                        }
+
                         int selledItems = Util.playerSellItems.get(player.getUniqueId());
                         int itemLimit = sql.getSlot(slot).clone().getPlayerItemLimit(player);
                         int totalLimit = Items.getConfig().getInt("limited.limit");
@@ -183,23 +241,17 @@ public class SellerListener implements Listener {
                         }
 
                         Util.playerSellItems.put(player.getUniqueId(), selledItems + count);
-                        sql.getSlot(slot).addItemLimit((Player) e.getWhoClicked(), count);
+                        sql.getSlot(slot).addItemLimit(player, count);
+
+                        amount += count;
+                        price += Double.parseDouble(format.format(sql.getPrice(slot) * count).replace(",", "."));
+                        itemStack.setAmount(count);
+                        player.getInventory().removeItem(itemStack);
+                        Understating.takePrice(slot, count);
                     }
-
-                    amount+=count;
-                    price += Double.parseDouble(format.format(sql.getPrice(slot) * count).replace(",", "."));
-                    itemStack.setAmount(count);
-                    player.getInventory().removeItem(itemStack);
-                    Understating.takePrice(slot, count);
                 }
-
             }
-
         }
-        Eco.getEconomy().depositPlayer(player, price);
-        Chat.sendMessage(e.getWhoClicked(), Config.getConfig().getString("messages.sell-inventory")
-                .replace("%price%", format.format(price).replace(",", "."))
-                .replace("%amount%", "x" + amount));
     }
 
 
