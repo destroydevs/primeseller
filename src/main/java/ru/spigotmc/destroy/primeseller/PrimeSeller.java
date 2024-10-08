@@ -11,6 +11,7 @@ import ru.spigotmc.destroy.primeseller.managers.ListenerManager;
 import ru.spigotmc.destroy.primeseller.managers.Manager;
 import ru.spigotmc.destroy.primeseller.util.Chat;
 import ru.spigotmc.destroy.primeseller.util.Eco;
+import ru.spigotmc.destroy.primeseller.util.ServerVersionUtil;
 import ru.spigotmc.destroy.primeseller.util.Updater;
 
 public final class PrimeSeller extends JavaPlugin {
@@ -36,7 +37,7 @@ public final class PrimeSeller extends JavaPlugin {
         msg("&a██║░░░░░██║░░██║██║██║░╚═╝░██║███████╗██████╔╝███████╗███████╗███████╗███████╗██║░░██║");
         msg("&a╚═╝░░░░░╚═╝░░╚═╝╚═╝╚═╝░░░░░╚═╝╚══════╝╚═════╝░╚══════╝╚══════╝╚══════╝╚══════╝╚═╝░░╚═╝");
         msg("&e▀█░█▀ █▀▀ █▀▀█ █▀▀ ░▀░ █▀▀█ █▀▀▄ ");
-        msg("&e░█▄█░ █▀▀ █▄▄▀ ▀▀█ ▀█▀ █░░█ █░░█ &bv"+getDescription().getVersion()+" &7| &fDeveloper: &dTelegram: &b@byteswing");
+        msg("&e░█▄█░ █▀▀ █▄▄▀ ▀▀█ ▀█▀ █░░█ █░░█ &bv"+getDescription().getVersion()+" &7| &fDeveloper: &dTelegram: &b@byteswing &7| &dServer: "+ ServerVersionUtil.getServerVersion().getMajor()+"."+ServerVersionUtil.getServerVersion().getMinor()+"."+ServerVersionUtil.getServerVersion().getPatch());
         msg("&e░░▀░░ ▀▀▀ ▀░▀▀ ▀▀▀ ▀▀▀ ▀▀▀▀ ▀░░▀ ");
         if(Config.getConfig().getBoolean("metrics")) {
             new Metrics(this,17800);
@@ -55,7 +56,7 @@ public final class PrimeSeller extends JavaPlugin {
         msg("&c██║░░░░░██║░░██║██║██║░╚═╝░██║███████╗██████╔╝███████╗███████╗███████╗███████╗██║░░██║");
         msg("&c╚═╝░░░░░╚═╝░░╚═╝╚═╝╚═╝░░░░░╚═╝╚══════╝╚═════╝░╚══════╝╚══════╝╚══════╝╚══════╝╚═╝░░╚═╝");
         msg("&e▀█░█▀ █▀▀ █▀▀█ █▀▀ ░▀░ █▀▀█ █▀▀▄ ");
-        msg("&e░█▄█░ █▀▀ █▄▄▀ ▀▀█ ▀█▀ █░░█ █░░█ &bv"+getDescription().getVersion()+" &7| &fDeveloper: &dTelegram: &b@byteswing");
+        msg("&e░█▄█░ █▀▀ █▄▄▀ ▀▀█ ▀█▀ █░░█ █░░█ &bv"+getDescription().getVersion()+" &7| &fDeveloper: &dTelegram: &b@byteswing &7| &dServer: "+ ServerVersionUtil.getServerVersion().getMajor()+"."+ServerVersionUtil.getServerVersion().getMinor()+"."+ServerVersionUtil.getServerVersion().getPatch());
         msg("&e░░▀░░ ▀▀▀ ▀░▀▀ ▀▀▀ ▀▀▀ ▀▀▀▀ ▀░░▀ ");
         MapBase sql = new MapBase();
         sql.clear();
