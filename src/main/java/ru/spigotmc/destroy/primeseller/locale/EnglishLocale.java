@@ -22,6 +22,10 @@ public class EnglishLocale {
         @Comment(comment = "Sell on middle mouse click. If false, sell with SHIFT+LMB")
         public boolean middleClickSellAll = true;
 
+        @Path(path = "inv-sell-priority")
+        @Comment(comment = "Priority of selling inventory to the buyer. UNLIMITED - unlimited first, LIMITED - limited first.", type = CommentType.ABOVE)
+        public String prioritySellInv = "LIMITED";
+
         @Path(path = "enable-permission")
         @Comment(comment = "Enable permission for command usage? primeseller.open")
         public boolean enablePermission = false;
