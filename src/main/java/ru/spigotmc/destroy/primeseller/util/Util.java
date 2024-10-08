@@ -1,5 +1,6 @@
 package ru.spigotmc.destroy.primeseller.util;
 
+import com.google.gson.Gson;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.bukkit.Bukkit;
@@ -8,13 +9,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 import ru.spigotmc.destroy.primeseller.configurations.Config;
 import ru.spigotmc.destroy.primeseller.configurations.database.MapBase;
 import ru.spigotmc.destroy.primeseller.configurations.Items;
 import ru.spigotmc.destroy.primeseller.configurations.Menu;
 import ru.spigotmc.destroy.primeseller.configurations.database.SellItem;
+import ru.spigotmc.destroy.primeseller.configurations.database.SkinData;
 
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -183,24 +190,48 @@ public class Util {
         return count;
     }
 
+    private static SkinData decodeBase64(String url) {
+        String json = new String(Base64.getDecoder().decode(url));
+
+        Gson gson = new Gson();
+
+        return gson.fromJson(json, SkinData.class);
+    }
+
     public static ItemStack getSkull(String url) {
-        ItemStack item = new ItemStack(Material.PLAYER_HEAD);;
-        if(Bukkit.getBukkitVersion().contains("1.12") || Bukkit.getBukkitVersion().contains("1_12")) {
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+        if(ServerVersionUtil.getServerVersion().getMinor() <= 12) {
             item = new ItemStack(Material.valueOf("HEAD"));
         }
-        ItemMeta meta = item.getItemMeta();
-        GameProfile profile = new GameProfile(UUID.randomUUID(), "byteswing");
-        profile.getProperties().put("textures", new Property("textures", url));
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+        if (ServerVersionUtil.getServerVersion().getMinor() >= 18) {
+            PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID());
+            PlayerTextures textures = profile.getTextures();
+            SkinData data = decodeBase64(url);
+            try {
+                URL skinUrl = new URL(data.getTextures().getUrl());
+                textures.setSkin(skinUrl);
+            } catch (MalformedURLException e) {
+                Bukkit.getLogger().severe("[PrimeSeller] Произошла ошибка при обработке текстуры головы.");
+                return item;
+            }
+            profile.setTextures(textures);
+            meta.setOwnerProfile(profile);
+            item.setItemMeta(meta);
+        } else {
+            GameProfile profile = new GameProfile(UUID.randomUUID(), "byteswing");
+            profile.getProperties().put("textures", new Property("textures", url));
 
-        try {
-            Field profileField = meta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(meta, profile);
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException var6) {
-            var6.printStackTrace();
+            try {
+                Field profileField = meta.getClass().getDeclaredField("profile");
+                profileField.setAccessible(true);
+                profileField.set(meta, profile);
+            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException var6) {
+                var6.printStackTrace();
+            }
+
+            item.setItemMeta(meta);
         }
-
-        item.setItemMeta(meta);
         return item;
     }
 
