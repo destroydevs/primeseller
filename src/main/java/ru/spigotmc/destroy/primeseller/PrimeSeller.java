@@ -24,27 +24,41 @@ public final class PrimeSeller extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        ConfigManager.loadConfigurations(this);
-        Eco.init();
-        loadManager(new ListenerManager(), this);
-        loadManager(new CommandManager(), this);
-        Updater.startCountdown();
-        Updater.start(this);
-        msg("&a██████╗░██████╗░██╗███╗░░░███╗███████╗░██████╗███████╗██╗░░░░░██╗░░░░░███████╗██████╗░");
-        msg("&a██╔══██╗██╔══██╗██║████╗░████║██╔════╝██╔════╝██╔════╝██║░░░░░██║░░░░░██╔════╝██╔══██╗");
-        msg("&a██████╔╝██████╔╝██║██╔████╔██║█████╗░░╚█████╗░█████╗░░██║░░░░░██║░░░░░█████╗░░██████╔╝");
-        msg("&a██╔═══╝░██╔══██╗██║██║╚██╔╝██║██╔══╝░░░╚═══██╗██╔══╝░░██║░░░░░██║░░░░░██╔══╝░░██╔══██╗");
-        msg("&a██║░░░░░██║░░██║██║██║░╚═╝░██║███████╗██████╔╝███████╗███████╗███████╗███████╗██║░░██║");
-        msg("&a╚═╝░░░░░╚═╝░░╚═╝╚═╝╚═╝░░░░░╚═╝╚══════╝╚═════╝░╚══════╝╚══════╝╚══════╝╚══════╝╚═╝░░╚═╝");
-        msg("&e▀█░█▀ █▀▀ █▀▀█ █▀▀ ░▀░ █▀▀█ █▀▀▄ ");
-        msg("&e░█▄█░ █▀▀ █▄▄▀ ▀▀█ ▀█▀ █░░█ █░░█ &bv"+getDescription().getVersion()+" &7| &fDeveloper: &dTelegram: &b@byteswing &7| &dServer: "+ ServerVersionUtil.getServerVersion().getMajor()+"."+ServerVersionUtil.getServerVersion().getMinor()+"."+ServerVersionUtil.getServerVersion().getPatch());
-        msg("&e░░▀░░ ▀▀▀ ▀░▀▀ ▀▀▀ ▀▀▀ ▀▀▀▀ ▀░░▀ ");
-        if(Config.getConfig().getBoolean("metrics")) {
-            new Metrics(this,17800);
-        }
-        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new Expansions().register();
-        }
+        JavaChecker.checkJavaVersion(()->{
+            ConfigManager.loadConfigurations(this);
+            Eco.init();
+            loadManager(new ListenerManager(), this);
+            loadManager(new CommandManager(), this);
+            Updater.startCountdown();
+            Updater.start(this);
+            msg("&a██████╗░██████╗░██╗███╗░░░███╗███████╗░██████╗███████╗██╗░░░░░██╗░░░░░███████╗██████╗░");
+            msg("&a██╔══██╗██╔══██╗██║████╗░████║██╔════╝██╔════╝██╔════╝██║░░░░░██║░░░░░██╔════╝██╔══██╗");
+            msg("&a██████╔╝██████╔╝██║██╔████╔██║█████╗░░╚█████╗░█████╗░░██║░░░░░██║░░░░░█████╗░░██████╔╝");
+            msg("&a██╔═══╝░██╔══██╗██║██║╚██╔╝██║██╔══╝░░░╚═══██╗██╔══╝░░██║░░░░░██║░░░░░██╔══╝░░██╔══██╗");
+            msg("&a██║░░░░░██║░░██║██║██║░╚═╝░██║███████╗██████╔╝███████╗███████╗███████╗███████╗██║░░██║");
+            msg("&a╚═╝░░░░░╚═╝░░╚═╝╚═╝╚═╝░░░░░╚═╝╚══════╝╚═════╝░╚══════╝╚══════╝╚══════╝╚══════╝╚═╝░░╚═╝");
+            msg("&e▀█░█▀ █▀▀ █▀▀█ █▀▀ ░▀░ █▀▀█ █▀▀▄ ");
+            msg("&e░█▄█░ █▀▀ █▄▄▀ ▀▀█ ▀█▀ █░░█ █░░█ &bv"+getDescription().getVersion()+" &7| &fDeveloper: &dTelegram: &b@byteswing &7| &dServer: "+ ServerVersionUtil.getServerVersion().getMajor()+"."+ServerVersionUtil.getServerVersion().getMinor()+"."+ServerVersionUtil.getServerVersion().getPatch());
+            msg("&e░░▀░░ ▀▀▀ ▀░▀▀ ▀▀▀ ▀▀▀ ▀▀▀▀ ▀░░▀ ");
+            UpdateChecker.start();
+            if(Config.getConfig().getBoolean("metrics")) {
+                new Metrics(this,17800);
+            }
+            if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                new Expansions().register();
+            }
+        }, ()->{
+            msg(" ");
+            msg("&c[PrimeSeller] Ваша версия Java не поддерживается.");
+            msg("&c[PrimeSeller] Используйте версию 11+.");
+            msg("&c[PrimeSeller] Плагин был отключен.");
+            msg(" ");
+            msg("&c[PrimeSeller] Your Java version is not supported.");
+            msg("&c[PrimeSeller] Please use version 11+.");
+            msg("&c[PrimeSeller] The plugin has been disabled.");
+            msg(" ");
+            this.setEnabled(false);
+        });
     }
 
     @Override
