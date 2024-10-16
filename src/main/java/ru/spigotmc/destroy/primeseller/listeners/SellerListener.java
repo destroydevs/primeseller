@@ -43,21 +43,22 @@ public class SellerListener implements Listener {
                 return;
             }
             MapBase sql = new MapBase();
+            ClickType clickType = e.getClick();
             player.updateInventory();
             handleSellInvSlots(e,player,sql);
             handleExitSlots(e, player);
             handleCountdownSlots(e, player);
 
-            if (e.getClick().isLeftClick()) {
+            if (clickType == ClickType.LEFT) {
                 sellAction(sql, e, player, 1);
-            } else if (e.getClick().isRightClick()) {
+            } else if (clickType == ClickType.RIGHT) {
                 sellAction(sql, e, player, 64);
             } else if (Config.getConfig().getBoolean("middle-click-sell-all")) {
-                if (e.getClick() == ClickType.MIDDLE) {
+                if (clickType == ClickType.MIDDLE) {
                     sellAction(sql, e, player, Util.calc(player, sql.getSlot(e.getSlot()).getItem()));
                 }
             } else {
-                if (e.getClick().isShiftClick() && e.getClick().isLeftClick()) {
+                if (clickType == ClickType.SHIFT_LEFT) {
                     sellAction(sql, e, player, Util.calc(player, sql.getSlot(e.getSlot()).getItem()));
                 }
             }
@@ -165,7 +166,6 @@ public class SellerListener implements Listener {
             if (type.equals("LIMITED")) {
                 sellLimited(player,sql,price,amount);
                 sellUnLimited(player,sql,price,amount);
-                return;
             }
             if (type.equals("UNLIMITED")) {
                 sellUnLimited(player,sql,price,amount);
