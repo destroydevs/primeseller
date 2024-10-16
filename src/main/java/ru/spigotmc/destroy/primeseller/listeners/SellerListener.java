@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import ru.spigotmc.destroy.primeseller.PrimeSeller;
@@ -166,8 +167,6 @@ public class SellerListener implements Listener {
                 sellUnLimited(player,sql,price,amount);
                 return;
             }
-
-
             if (type.equals("UNLIMITED")) {
                 sellUnLimited(player,sql,price,amount);
                 sellLimited(player,sql,price,amount);
