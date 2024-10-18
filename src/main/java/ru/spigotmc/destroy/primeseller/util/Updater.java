@@ -44,9 +44,9 @@ public class Updater {
         } else {
             if (type == 2) {
                 int seconds = counter.get("limited");
-                int hours = seconds / 3600; // Количество часов
-                int minutes = (seconds % 3600) / 60; // Количество минут
-                int remainingSeconds = seconds % 60; // Оставшиеся секунды
+                int hours = seconds / 3600;
+                int minutes = (seconds % 3600) / 60;
+                int remainingSeconds = seconds % 60;
 
                 return Config.getConfig().getString("time-format")
                         .replace("hh", String.valueOf(hours))
@@ -70,9 +70,9 @@ public class Updater {
         } else {
             if (type == 2) {
                 int seconds = counter.get("unlimited");
-                int hours = seconds / 3600; // Количество часов
-                int minutes = (seconds % 3600) / 60; // Количество минут
-                int remainingSeconds = seconds % 60; // Оставшиеся секунды
+                int hours = seconds / 3600;
+                int minutes = (seconds % 3600) / 60;
+                int remainingSeconds = seconds % 60;
 
                 return Config.getConfig().getString("time-format")
                         .replace("hh", String.valueOf(hours))

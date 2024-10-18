@@ -1,5 +1,5 @@
 name: PrimeSeller
-version: '2.4.1'
+version: '2.4.2'
 main: ru.spigotmc.destroy.primeseller.PrimeSeller
 api-version: 1.13
 softdepend: [ Vault, PlaceholderAPI ]

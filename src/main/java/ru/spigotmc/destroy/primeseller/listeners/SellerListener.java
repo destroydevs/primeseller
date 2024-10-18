@@ -164,12 +164,16 @@ public class SellerListener implements Listener {
             }
 
             if (type.equals("LIMITED")) {
-                sellLimited(player,sql,price,amount);
-                sellUnLimited(player,sql,price,amount);
+                Data lim = sellLimited(player,sql);
+                Data unlim = sellUnLimited(player,sql);
+                amount+=lim.amount+unlim.amount;
+                price+=lim.price+unlim.price;
             }
             if (type.equals("UNLIMITED")) {
-                sellUnLimited(player,sql,price,amount);
-                sellLimited(player,sql,price,amount);
+                Data unlim = sellUnLimited(player,sql);
+                Data lim = sellLimited(player,sql);
+                amount+=lim.amount+unlim.amount;
+                price+=lim.price+unlim.price;
             }
         }
 
@@ -179,7 +183,9 @@ public class SellerListener implements Listener {
                 .replace("%amount%", "x" + amount));
     }
 
-    private void sellUnLimited(Player player, MapBase sql, double price, int amount) {
+    private Data sellUnLimited(Player player, MapBase sql) {
+        double price = 0;
+        int amount = 0;
         for (ItemStack item : player.getInventory().getContents()) {
             if (item == null || item.getType() == Material.AIR) {
                 continue;
@@ -205,9 +211,12 @@ public class SellerListener implements Listener {
                 }
             }
         }
+        return new Data(price,amount);
     }
 
-    private void sellLimited(Player player, MapBase sql, double price, int amount) {
+    private Data sellLimited(Player player, MapBase sql) {
+        double price = 0;
+        int amount = 0;
         for (ItemStack item : player.getInventory().getContents()) {
             if (item == null || item.getType() == Material.AIR) {
                 continue;
@@ -250,6 +259,17 @@ public class SellerListener implements Listener {
                     }
                 }
             }
+        }
+        return new Data(price,amount);
+    }
+
+    public static class Data {
+        double price;
+        int amount;
+
+        public Data(double price, int amount) {
+            this.price = price;
+            this.amount = amount;
         }
     }
 
