@@ -35,7 +35,7 @@ public class SellerListener implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getView().getTitle().equals("§7§0" + Menu.getConfig().getString("title"))) {
+        if (e.getView().getTitle().equals("§7§0" + Chat.color(Menu.getConfig().getString("title")))) {
             Player player = (Player) e.getWhoClicked();
             e.setCancelled(true);
             if (e.getClickedInventory() == player.getInventory()) {

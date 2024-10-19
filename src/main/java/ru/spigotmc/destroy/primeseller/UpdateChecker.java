@@ -16,7 +16,7 @@ public class UpdateChecker {
 
     public static void start() {
         Executors.newSingleThreadScheduledExecutor()
-                .scheduleAtFixedRate(UpdateChecker::checkForUpdates,1,60*6, TimeUnit.MINUTES);
+                .scheduleAtFixedRate(UpdateChecker::checkForUpdates,10,60*2*60, TimeUnit.SECONDS);
     }
 
     private static void checkForUpdates() {
@@ -37,10 +37,15 @@ public class UpdateChecker {
 
                     if (!currentVersion.equals(latestVersion)) {
                         Bukkit.getConsoleSender().sendMessage(" ");
-                        Bukkit.getConsoleSender().sendMessage("§c[PrimeSeller] §eA new version of the plugin is available: v" + latestVersion);
-                        Bukkit.getConsoleSender().sendMessage("§c[PrimeSeller] §eCurrent version: v" + currentVersion);
-                        Bukkit.getConsoleSender().sendMessage("§c[PrimeSeller] §eDownload the latest version from SpigotMC.");
+                        Bukkit.getConsoleSender().sendMessage("§c[PrimeSeller] A new version of the plugin is available: §av" + latestVersion);
+                        Bukkit.getConsoleSender().sendMessage("§c[PrimeSeller] Current version: §ev" + currentVersion);
+                        Bukkit.getConsoleSender().sendMessage("§c[PrimeSeller] Download the latest version from SpigotMC.");
                         Bukkit.getConsoleSender().sendMessage(" ");
+                        Bukkit.getConsoleSender().sendMessage("§c[PrimeSeller] Доступна новая версия плагина: §av" + latestVersion);
+                        Bukkit.getConsoleSender().sendMessage("§c[PrimeSeller] Текущая версия: §ev" + currentVersion);
+                        Bukkit.getConsoleSender().sendMessage("§c[PrimeSeller] Скачайте последнюю версию с SpigotMC.");
+                        Bukkit.getConsoleSender().sendMessage(" ");
+
                     }
                 })
                 .exceptionally(e -> {

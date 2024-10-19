@@ -11,8 +11,8 @@ public class EnglishLocale {
 
     public static class Config {
         @Path(path = "time-zone")
-        @Comment(comment = "GMT+3 standard")
-        public String timezone = "GMT+3";
+        @Comment(comment = "All time zones: https://timeie.com/")
+        public String timezone = "Europe/Berlin";
 
         @Path(path = "metrics")
         @Comment(comment = "Plugin metrics")

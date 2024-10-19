@@ -146,8 +146,8 @@ public class RussianLocale {
 
     public static class Config {
         @Path(path = "time-zone")
-        @Comment(comment = "GMT+3 стандарт")
-        public String timezone = "GMT+3";
+        @Comment(comment = "все time-zone: https://timeie.com/")
+        public String timezone = "Europe/Moscow";
 
         @Path(path = "metrics")
         @Comment(comment = "метрика плагина")

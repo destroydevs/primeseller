@@ -22,7 +22,7 @@ public class GuiMenu {
     public static final HashMap<UUID, Integer> tasks = new HashMap<>();
 
     public static void open(Player p, PrimeSeller main) {
-        Inventory inv = Bukkit.createInventory(p, Menu.getConfig().getInt("size"), "§7§0"+Menu.getConfig().getString("title"));
+        Inventory inv = Bukkit.createInventory(p, Menu.getConfig().getInt("size"), "§7§0"+Chat.color(Menu.getConfig().getString("title")));
         List<String> unlim = new ArrayList<>();
         List<String> lim = new ArrayList<>();
         List<String> countdown = new ArrayList<>();

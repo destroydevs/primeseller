@@ -41,7 +41,88 @@ public class Util {
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yy HH:mm");
         long a = time* 1000L;
 
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(Config.getConfig().getString("time-zone")));
+        String timeZone = Config.getConfig().getString("time-zone");
+
+        switch (timeZone) {
+            case "GMT+2":
+                timeZone = "Europe/Paris";
+                break;
+            case "GMT+1":
+                timeZone = "Europe/London";
+                break;
+            case "GMT+0":
+                timeZone = "UTC";
+                break;
+            case "GMT-1":
+                timeZone = "Atlantic/Azores";
+                break;
+            case "GMT-2":
+                timeZone = "America/Noronha";
+                break;
+            case "GMT-3":
+                timeZone = "America/Argentina/Buenos_Aires";
+                break;
+            case "GMT-4":
+                timeZone = "America/La_Paz";
+                break;
+            case "GMT-5":
+                timeZone = "America/New_York";
+                break;
+            case "GMT-6":
+                timeZone = "America/Chicago";
+                break;
+            case "GMT-7":
+                timeZone = "America/Denver";
+                break;
+            case "GMT-8":
+                timeZone = "America/Los_Angeles";
+                break;
+            case "GMT-9":
+                timeZone = "America/Anchorage";
+                break;
+            case "GMT-10":
+                timeZone = "Pacific/Honolulu";
+                break;
+            case "GMT-11":
+                timeZone = "Pacific/Midway";
+                break;
+            case "GMT-12":
+                timeZone = "Pacific/Kwajalein";
+                break;
+            case "GMT+4":
+                timeZone = "Asia/Dubai";
+                break;
+            case "GMT+5":
+                timeZone = "Asia/Karachi";
+                break;
+            case "GMT+6":
+                timeZone = "Asia/Dhaka";
+                break;
+            case "GMT+7":
+                timeZone = "Asia/Bangkok";
+                break;
+            case "GMT+8":
+                timeZone = "Asia/Shanghai";
+                break;
+            case "GMT+9":
+                timeZone = "Asia/Tokyo";
+                break;
+            case "GMT+10":
+                timeZone = "Australia/Sydney";
+                break;
+            case "GMT+11":
+                timeZone = "Pacific/Guadalcanal";
+                break;
+            case "GMT+12":
+                timeZone = "Pacific/Fiji";
+                break;
+            default:
+                timeZone = "Europe/Moscow";
+                break;
+        }
+
+
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
         a += calendar.getTime().getTime()+calendar.getTimeZone().getRawOffset();
         return format.format(a);
     }
