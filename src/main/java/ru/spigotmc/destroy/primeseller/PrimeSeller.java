@@ -1,6 +1,5 @@
 package ru.spigotmc.destroy.primeseller;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.spigotmc.destroy.primeseller.configurations.Config;
