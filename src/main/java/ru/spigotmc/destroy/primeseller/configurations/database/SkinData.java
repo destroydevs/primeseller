@@ -5,10 +5,19 @@ import com.google.gson.annotations.SerializedName;
 public class SkinData {
 
     @SerializedName("textures")
-    Skin textures;
+    Textures textures;
 
-    public Skin getTextures() {
+    public Textures getTextures() {
         return textures;
+    }
+
+    public static class Textures {
+        @SerializedName("SKIN")
+        Skin skin;
+
+        public Skin getSkin() {
+            return skin;
+        }
     }
 
     public static class Skin {

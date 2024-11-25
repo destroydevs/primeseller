@@ -290,10 +290,11 @@ public class Util {
             PlayerTextures textures = profile.getTextures();
             SkinData data = decodeBase64(url);
             try {
-                URL skinUrl = new URL(data.getTextures().getUrl());
+                URL skinUrl = new URL(data.getTextures().getSkin().getUrl());
                 textures.setSkin(skinUrl);
             } catch (MalformedURLException e) {
                 Bukkit.getLogger().severe("[PrimeSeller] Произошла ошибка при обработке текстуры головы.");
+                Bukkit.getLogger().severe(data.getTextures().getSkin().getUrl());
                 return item;
             }
             profile.setTextures(textures);
