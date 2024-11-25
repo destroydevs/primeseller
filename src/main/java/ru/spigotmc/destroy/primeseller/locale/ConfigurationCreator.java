@@ -7,9 +7,10 @@ import ru.spigotmc.destroy.primeseller.locale.reflect.Comment;
 import ru.spigotmc.destroy.primeseller.locale.reflect.CommentType;
 import ru.spigotmc.destroy.primeseller.locale.reflect.Path;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,7 @@ public class ConfigurationCreator {
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setIndent(2);
         options.setIndicatorIndent(0);
+
 
         StringBuilder yamlOutput = new StringBuilder();
         addMapWithComments(yamlOutput, yamlMap, "");
@@ -199,7 +201,7 @@ public class ConfigurationCreator {
     }
 
     private static void saveToFile(String content, String filePath) throws IOException {
-        try (FileWriter writer = new FileWriter(filePath)) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8)) {
             writer.write(content);
         }
     }
