@@ -39,7 +39,7 @@ public final class PrimeSeller extends JavaPlugin {
             msg("&e▀█░█▀ █▀▀ █▀▀█ █▀▀ ░▀░ █▀▀█ █▀▀▄ &bv"+getDescription().getVersion());
             msg("&e░█▄█░ █▀▀ █▄▄▀ ▀▀█ ▀█▀ █░░█ █░░█ &7| &fDeveloper: &dTelegram: &b@byteswing");
             msg("&e░░▀░░ ▀▀▀ ▀░▀▀ ▀▀▀ ▀▀▀ ▀▀▀▀ ▀░░▀ &7| &fServer version: &7(&e"+ ServerVersionUtil.getServerVersion().getMajor()+"."+ServerVersionUtil.getServerVersion().getMinor()+"."+ServerVersionUtil.getServerVersion().getPatch()+"&7)");
-            UpdateChecker.start();
+            UpdateChecker.start(this);
             if(Config.getConfig().getBoolean("metrics")) {
                 new Metrics(this,17800);
             }

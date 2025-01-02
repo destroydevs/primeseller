@@ -18,7 +18,7 @@ public class ServerVersionUtil {
         int patch = 0;
         try {
             patch = Integer.parseInt(parts[2]);
-        } catch (NullPointerException e) {}
+        } catch (Exception ignored) {}
 
         return new ServerVersion(major,minor,patch);
     }

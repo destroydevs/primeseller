@@ -1,6 +1,7 @@
 package ru.spigotmc.destroy.primeseller;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -14,12 +15,12 @@ public class UpdateChecker {
     private static final String RESOURCE_URL = "https://www.spigotmc.org/resources/primeseller-advanced-buyer-of-items-1-13-1-21.108813/";
     private static final String API_URL = "https://api.spigotmc.org/legacy/update.php?resource=" + PLUGIN_ID;
 
-    public static void start() {
+    public static void start(Plugin plugin) {
         Executors.newSingleThreadScheduledExecutor()
-                .scheduleAtFixedRate(UpdateChecker::checkForUpdates,10,60*2*60, TimeUnit.SECONDS);
+                .scheduleAtFixedRate(()->UpdateChecker.checkForUpdates(plugin),10,60*2*60, TimeUnit.SECONDS);
     }
 
-    private static void checkForUpdates() {
+    private static void checkForUpdates(Plugin plugin) {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(API_URL))
@@ -33,7 +34,7 @@ public class UpdateChecker {
                     }
 
                     String latestVersion = response.body().replace(" ", "").substring(1);
-                    String currentVersion = PrimeSeller.getPlugin(PrimeSeller.class).getDescription().getVersion();
+                    String currentVersion = plugin.getDescription().getVersion();
 
                     if (!currentVersion.equals(latestVersion)) {
                         Bukkit.getConsoleSender().sendMessage(" ");

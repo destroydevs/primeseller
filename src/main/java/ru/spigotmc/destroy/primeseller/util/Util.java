@@ -21,6 +21,7 @@ import ru.spigotmc.destroy.primeseller.configurations.database.SkinData;
 
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -290,7 +291,7 @@ public class Util {
             PlayerTextures textures = profile.getTextures();
             SkinData data = decodeBase64(url);
             try {
-                URL skinUrl = new URL(data.getTextures().getSkin().getUrl());
+                URL skinUrl = URI.create(data.getTextures().getSkin().getUrl()).toURL();
                 textures.setSkin(skinUrl);
             } catch (MalformedURLException e) {
                 Bukkit.getLogger().severe("[PrimeSeller] Произошла ошибка при обработке текстуры головы.");
