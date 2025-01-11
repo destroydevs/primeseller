@@ -1,5 +1,7 @@
 package ru.spigotmc.destroy.primeseller;
 
+import com.github.Anon8281.universalScheduler.UniversalScheduler;
+import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.spigotmc.destroy.primeseller.configurations.Config;
@@ -21,15 +23,22 @@ public final class PrimeSeller extends JavaPlugin {
         Bukkit.getConsoleSender().sendMessage(prefix+ Chat.color(msg));
     }
 
+    private static TaskScheduler scheduler;
+
+    public static TaskScheduler getScheduler() {
+        return scheduler;
+    }
+
     @Override
     public void onEnable() {
         JavaChecker.checkJavaVersion(()->{
+            scheduler = UniversalScheduler.getScheduler(this);
             ConfigManager.loadConfigurations(this);
             Eco.init();
             loadManager(new ListenerManager(), this);
             loadManager(new CommandManager(), this);
             Updater.startCountdown();
-            Updater.start(this);
+            Updater.start();
             msg("&a██████╗░██████╗░██╗███╗░░░███╗███████╗░██████╗███████╗██╗░░░░░██╗░░░░░███████╗██████╗░");
             msg("&a██╔══██╗██╔══██╗██║████╗░████║██╔════╝██╔════╝██╔════╝██║░░░░░██║░░░░░██╔════╝██╔══██╗");
             msg("&a██████╔╝██████╔╝██║██╔████╔██║█████╗░░╚█████╗░█████╗░░██║░░░░░██║░░░░░█████╗░░██████╔╝");

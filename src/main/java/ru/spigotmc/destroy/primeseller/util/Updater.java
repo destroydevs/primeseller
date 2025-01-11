@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import ru.spigotmc.destroy.primeseller.PrimeSeller;
 import ru.spigotmc.destroy.primeseller.configurations.Config;
 import ru.spigotmc.destroy.primeseller.configurations.database.MapBase;
 import ru.spigotmc.destroy.primeseller.configurations.Items;
@@ -145,30 +146,20 @@ public class Updater {
 
 
 
-    public static void startUnLim(Plugin plugin) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Updater.clearAndCreateUnLimited();
-            }
-        }.runTaskTimer(plugin, 0,Items.getConfig().getInt("unlimited.update")*20L);
+    public static void startUnLim() {
+        PrimeSeller.getScheduler().runTaskTimer(Updater::clearAndCreateUnLimited,0,Items.getConfig().getInt("unlimited.update")*20L);
     }
 
-    public static void startLim(Plugin plugin) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Updater.clearAndCreateLimited();
-            }
-        }.runTaskTimer(plugin, 0,Items.getConfig().getInt("limited.update")*20L);
+    public static void startLim() {
+        PrimeSeller.getScheduler().runTaskTimer(Updater::clearAndCreateLimited,0,Items.getConfig().getInt("limited.update")*20L);
     }
 
-    public static void start(Plugin plugin) {
+    public static void start() {
         if(Items.getConfig().getBoolean("unlimited.enable",true)) {
-            startUnLim(plugin);
+            startUnLim();
         }
         if(Items.getConfig().getBoolean("limited.enable",true)) {
-            startLim(plugin);
+            startLim();
         }
         Util.update = true;
     }
