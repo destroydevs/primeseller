@@ -20,7 +20,7 @@ public class PlayerCloseListener implements Listener {
     public void onClose(InventoryCloseEvent e) {
         UUID id = e.getPlayer().getUniqueId();
         if(GuiMenu.tasks.containsKey(id)) {
-            Bukkit.getScheduler().cancelTask(GuiMenu.tasks.get(id));
+            GuiMenu.tasks.get(id).cancel();
             GuiMenu.tasks.remove(id);
         }
     }

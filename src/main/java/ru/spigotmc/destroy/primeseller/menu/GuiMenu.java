@@ -1,5 +1,6 @@
 package ru.spigotmc.destroy.primeseller.menu;
 
+import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 public class GuiMenu {
 
-    public static final HashMap<UUID, Integer> tasks = new HashMap<>();
+    public static final HashMap<UUID, MyScheduledTask> tasks = new HashMap<>();
 
     public static void open(Player p, PrimeSeller main) {
         Inventory inv = Bukkit.createInventory(p, Menu.getConfig().getInt("size"), "§7§0"+Chat.color(Menu.getConfig().getString("title")));
@@ -38,8 +39,8 @@ public class GuiMenu {
         }
 
         if(!tasks.containsKey(p.getUniqueId())) {
-            tasks.put(p.getUniqueId(), Bukkit.getScheduler().runTaskTimer(main, () -> {
-                Bukkit.getScheduler().runTaskTimer(main, ()-> {
+            tasks.put(p.getUniqueId(), PrimeSeller.getScheduler().runTaskTimer(() -> {
+                PrimeSeller.getScheduler().runTaskTimer(()-> {
                     if (Util.update && tasks.containsKey(p.getUniqueId())) {
                         try {
                             Util.fillInventory(inv, countdown, unlim, lim, p);
@@ -79,7 +80,7 @@ public class GuiMenu {
                     inv.setItem(i, item);
                     countdown.clear();
                 }
-            }, 0, 20).getTaskId());
+            }, 0, 20));
         }
         p.openInventory(inv);
     }
