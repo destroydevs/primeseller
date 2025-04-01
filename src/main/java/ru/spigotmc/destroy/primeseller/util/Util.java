@@ -26,6 +26,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Util {
 
@@ -182,7 +183,7 @@ public class Util {
                     Bukkit.getLogger().warning("Неизвестный предмет: " + items);
                     continue;
                 }
-                lore.forEach(Chat::color);
+                lore = lore.stream().map(Chat::color).collect(Collectors.toList());
                 ItemMeta meta = item.getItemMeta();
                 meta.setCustomModelData(modelId);
                 meta.setLore(lore);
@@ -202,7 +203,7 @@ public class Util {
                 Bukkit.getLogger().warning("Неизвестный предмет: " + items);
                 break;
             }
-            lore.forEach(Chat::color);
+            lore = lore.stream().map(Chat::color).collect(Collectors.toList());
             ItemMeta meta = item.getItemMeta();
             meta.setLore(lore);
             meta.setCustomModelData(modelId);
@@ -221,7 +222,7 @@ public class Util {
                 Bukkit.getLogger().warning("Неизвестный предмет: " + items);
                 break;
             }
-            lore.forEach(Chat::color);
+            lore = lore.stream().map(Chat::color).collect(Collectors.toList());
             ItemMeta meta = item.getItemMeta();
             meta.setLore(lore);
             meta.setCustomModelData(modelId);
@@ -317,34 +318,5 @@ public class Util {
         }
         return item;
     }
-
-    /*public static String getCountry() throws IOException {
-        List<String> list = new ArrayList<>();
-        URL oracle = new URL("http://www.geoplugin.net/xml.gp?ip=xx.xx.xx.xx");
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(oracle.openStream()));
-
-        String inputLine;
-        while ((inputLine = in.readLine()) != null)
-            list.add(inputLine);
-
-        String s = list.get(13).replace("\t<geoplugin_countryName>", "").replace("</geoplugin_countryName>", "");
-        in.close();
-        return s;
-    }
-    public static String getCountry(String ip) throws IOException {
-        List<String> list = new ArrayList<>();
-        URL oracle = new URL("http://www.geoplugin.net/xml.gp?ip="+ip);
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(oracle.openStream()));
-
-        String inputLine;
-        while ((inputLine = in.readLine()) != null)
-            list.add(inputLine);
-
-        String s = list.get(13).replace("\t<geoplugin_countryName>", "").replace("</geoplugin_countryName>", "");
-        in.close();
-        return s;
-    }*/
 
 }

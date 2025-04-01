@@ -10,28 +10,8 @@ import ru.spigotmc.destroy.primeseller.locale.ConfigurationCreator;
 import java.io.File;
 import java.io.IOException;
 
-public class Menu {
-
-    private static File file;
-    private static FileConfiguration config;
-
-    public void loadMenuYaml(Plugin main) {
-        file = new File(main.getDataFolder(), "menu.yml");
-        if (!file.exists()) {
-            ConfigurationCreator.createConfig("menu.yml",main);
-        }
-        config = YamlConfiguration.loadConfiguration(file);
-    }
-
-    public static void reloadConfig() {
-        try {
-            config.load(file);
-        } catch (IOException | InvalidConfigurationException e) {
-            Bukkit.getLogger().warning("Не удалось загрузить menu.yml!");
-        }
-    }
-
-    public static FileConfiguration getConfig() {
-        return config;
+public class Menu extends AbstractConfig {
+    public Menu(String configName) {
+        super(configName);
     }
 }

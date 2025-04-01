@@ -5,25 +5,30 @@ import ru.spigotmc.destroy.primeseller.configurations.Config;
 import ru.spigotmc.destroy.primeseller.configurations.Items;
 import ru.spigotmc.destroy.primeseller.configurations.Lang;
 import ru.spigotmc.destroy.primeseller.configurations.Menu;
+import ru.spigotmc.destroy.primeseller.locale.EnglishLocale;
+import ru.spigotmc.destroy.primeseller.locale.RussianLocale;
 
 public class ConfigManager {
 
-    private static final Menu m = new Menu();
-    private static final Items i = new Items();
-    private static final Config c = new Config();
-    private static final Lang l = new Lang();
+    private static final Menu menu = new Menu("menu.yml");
+    private static final Items items = new Items("items.yml");
+    private static final Config config = new Config("config.yml");
+    private static final Lang lang = new Lang("lang.yml");
+
+    private static RussianLocale ruLocale;
+    private static EnglishLocale enLocale;
 
     public static void loadConfigurations(Plugin plugin) {
-        l.loadYaml(plugin);
-        c.loadConfigYaml(plugin);
-        i.loadItemsYaml(plugin);
-        m.loadMenuYaml(plugin);
+        lang.loadYaml(plugin, "en");
+        config.loadYaml(plugin, lang.getLocale());
+        items.loadYaml(plugin, lang.getLocale());
+        menu.loadYaml(plugin, lang.getLocale());
     }
 
     public static void reloadConfigurations() {
-        Lang.reloadConfig();
-        Config.reloadConfig();
-        Items.reloadConfig();
-        Menu.reloadConfig();
+        lang.reloadConfig();
+        config.reloadConfig();
+        items.reloadConfig();
+        menu.reloadConfig();
     }
 }

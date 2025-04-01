@@ -28,7 +28,7 @@ public class OpenCommand implements CommandExecutor {
                     return true;
                 }
             }
-            GuiMenu.open(p, main);
+            GuiMenu.open(p);
             p.playSound(p.getLocation(), Sound.UI_TOAST_IN, 1,1);
         }
         return true;

@@ -14,28 +14,31 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SellerMenu {
 
     public static double generate(double min, double max) {
-        return ThreadLocalRandom.current().nextDouble(min, max+0.000000001);
+        if (min < max) {
+            return min;
+        }
+        return ThreadLocalRandom.current().nextDouble(min, max);
     }
 
     public static void createUnLimItems() {
         List<String> randomItems = new ArrayList<>(Items.getConfig().getConfigurationSection("unlimited.items").getKeys(false));
         List<Integer> unlimSlots = new ArrayList<>(Menu.getConfig().getIntegerList("unlim-items.slots"));
 
-        for(int i = 0; i < unlimSlots.size(); i++) {
-            if(randomItems.isEmpty()) {
+        for (Integer unlimSlot : unlimSlots) {
+            if (randomItems.isEmpty()) {
                 break;
             }
-            int random = (int) (Math.random()*randomItems.size());
+            int random = (int) (Math.random() * randomItems.size());
             String item = randomItems.get(random);
             double min = Double.parseDouble(Items.getConfig().getString("unlimited.items." + item + ".min-price").replace(",", "."));
             double max = Double.parseDouble(Items.getConfig().getString("unlimited.items." + item + ".max-price").replace(",", "."));
             int lim = Items.getConfig().getInt("limited.limit-per-items");
             double price = generate(min, max);
             try {
-                MapBase.saveMaterial(new ItemStack(Material.valueOf(item.toUpperCase(Locale.ENGLISH))), unlimSlots.get(i), price, lim, false);
+                MapBase.saveMaterial(new ItemStack(Material.valueOf(item.toUpperCase(Locale.ENGLISH))), unlimSlot, price, lim, false);
             } catch (IllegalArgumentException e) {
-                ItemStack itemStack = Items.getConfig().getItemStack("unlimited.items."+item+".item");
-                MapBase.saveMaterial(itemStack, unlimSlots.get(i), price, lim, false);
+                ItemStack itemStack = Items.getConfig().getItemStack("unlimited.items." + item + ".item");
+                MapBase.saveMaterial(itemStack, unlimSlot, price, lim, false);
             }
             randomItems.remove(random);
         }
