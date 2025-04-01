@@ -5,8 +5,6 @@ import ru.spigotmc.destroy.primeseller.configurations.Config;
 import ru.spigotmc.destroy.primeseller.configurations.Items;
 import ru.spigotmc.destroy.primeseller.configurations.Lang;
 import ru.spigotmc.destroy.primeseller.configurations.Menu;
-import ru.spigotmc.destroy.primeseller.locale.EnglishLocale;
-import ru.spigotmc.destroy.primeseller.locale.RussianLocale;
 
 public class ConfigManager {
 
@@ -14,9 +12,6 @@ public class ConfigManager {
     private static final Items items = new Items("items.yml");
     private static final Config config = new Config("config.yml");
     private static final Lang lang = new Lang("lang.yml");
-
-    private static RussianLocale ruLocale;
-    private static EnglishLocale enLocale;
 
     public static void loadConfigurations(Plugin plugin) {
         lang.loadYaml(plugin, "en");

@@ -6,6 +6,7 @@ import org.bukkit.plugin.Plugin;
 import ru.spigotmc.destroy.primeseller.locale.reflect.Comment;
 import ru.spigotmc.destroy.primeseller.locale.reflect.CommentType;
 import ru.spigotmc.destroy.primeseller.locale.reflect.Path;
+import ru.spigotmc.destroy.primeseller.locale.Locale;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,7 +90,7 @@ public class ConfigurationCreator {
         }
     }
 
-    public static <T extends Class<T>> Class<T> loadConfig(String configName, Plugin plugin, T configObject) {
+    public static <T> Class<T> loadConfig(String configName, Plugin plugin, Class<T> configObject) {
         File configFile = new File(plugin.getDataFolder(), configName);
         if (!configFile.exists()) {
             return null;

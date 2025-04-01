@@ -2,7 +2,6 @@ package ru.spigotmc.destroy.primeseller.locale.reflect;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.List;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Comment {
