@@ -1,8 +1,8 @@
 import org.yaml.snakeyaml.DumperOptions;
-import ru.spigotmc.destroy.primeseller.locale.EnglishLocale;
-import ru.spigotmc.destroy.primeseller.locale.reflect.Comment;
-import ru.spigotmc.destroy.primeseller.locale.reflect.CommentType;
-import ru.spigotmc.destroy.primeseller.locale.reflect.Path;
+import ru.destroy.primeseller.locale.EnglishLocale;
+import ru.destroy.primeseller.locale.reflect.Comment;
+import ru.destroy.primeseller.locale.reflect.CommentType;
+import ru.destroy.primeseller.locale.reflect.Path;
 
 import java.io.FileWriter;
 import java.io.IOException;
