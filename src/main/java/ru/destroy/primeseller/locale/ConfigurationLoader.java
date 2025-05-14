@@ -12,7 +12,7 @@ import java.util.List;
 public class ConfigurationLoader {
 
     public static void loadConfigs(Plugin plugin, Locale localeConfig) {
-        loadConfigFile("menu.yml", plugin, localeConfig.menu, localeConfig.menu.getClass(), null);
+        loadConfigFile("langs/ru/menu.yml", plugin, localeConfig.menu, localeConfig.menu.getClass(), null);
         loadConfigFile("config.yml", plugin, localeConfig.config, localeConfig.config.getClass(), null);
     }
 

@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'me.champeau.jmh' version '0.7.2'
 }
 
 group = 'ru.destroy'
@@ -26,6 +27,9 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.11.6'
     runtimeOnly 'com.h2database:h2:1.4.190'
     implementation 'com.github.Anon8281:UniversalScheduler:0.1.6'
+
+    jmhImplementation 'org.openjdk.jmh:jmh-core:1.37'
+    jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 }
 
 def targetJavaVersion = 17

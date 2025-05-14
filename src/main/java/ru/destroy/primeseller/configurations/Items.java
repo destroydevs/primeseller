@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 
 public class Items extends AbstractConfig {
 
-    private static DecimalFormat format = new DecimalFormat("##.##");
+    private static final DecimalFormat format = new DecimalFormat("##.##");
 
     public Items(String configName) {
         super(configName);

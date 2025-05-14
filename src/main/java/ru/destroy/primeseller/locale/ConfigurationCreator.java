@@ -16,7 +16,7 @@ public class ConfigurationCreator {
 
     public static void createConfig(String configName, Locales locale, Plugin plugin) {
         Object configObject = null;
-        if (configName.equalsIgnoreCase("menu.yml")) {
+        if (configName.equalsIgnoreCase("langs/ru/menu.yml")) {
             switch (locale) {
                 case EN:
                     configObject = new EnglishLocale.Menu();

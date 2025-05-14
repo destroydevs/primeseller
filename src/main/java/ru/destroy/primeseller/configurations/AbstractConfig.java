@@ -7,20 +7,22 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import ru.destroy.primeseller.locale.ConfigurationCreator;
 import ru.destroy.primeseller.locale.Locales;
-import ru.spigotmc.destroy.primeseller.locale.*;
 
 import java.io.File;
 import java.io.IOException;
 
 public abstract class AbstractConfig {
     private final String configName;
+    private File file;
+    private FileConfiguration config;
 
     public AbstractConfig(String configName) {
         this.configName = configName;
     }
 
-    private File file;
-    private FileConfiguration config;
+    public ConfigSectionHelper sectionHelper(String section) {
+        return new ConfigSectionHelper(this, section);
+    }
 
     public void loadYaml(Plugin main, Locales lang) {
         file = new File(main.getDataFolder(), configName);

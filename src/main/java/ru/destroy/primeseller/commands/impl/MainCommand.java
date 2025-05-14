@@ -1,22 +1,19 @@
-package ru.destroy.primeseller.commands;
+package ru.destroy.primeseller.commands.impl;
 
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import ru.destroy.primeseller.commands.CommandRegistry;
 import ru.destroy.primeseller.configurations.Config;
-import ru.destroy.primeseller.managers.ConfigManager;
 import ru.destroy.primeseller.configurations.Items;
-import ru.destroy.primeseller.PrimeSeller;
+import ru.destroy.primeseller.managers.ConfigManager;
 import ru.destroy.primeseller.util.Chat;
 import ru.destroy.primeseller.util.Updater;
 
-public class PrimeSellerCommands implements CommandExecutor {
-
-    public PrimeSellerCommands(PrimeSeller main) {
-        main.getCommand("PrimeSeller").setExecutor(this);
-    }
+@CommandRegistry(command = "primeseller")
+public class MainCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

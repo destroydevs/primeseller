@@ -17,7 +17,7 @@ public class test {
 
         try {
             String yamlOutput = generateConfig(config);
-            saveToFile(yamlOutput, "config.yml");
+            saveToFile(yamlOutput, "langs/ru/config.yml");
         } catch (IllegalAccessException | IOException e) {
             e.printStackTrace();
         }

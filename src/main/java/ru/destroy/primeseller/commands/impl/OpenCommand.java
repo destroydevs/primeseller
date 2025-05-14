@@ -1,4 +1,4 @@
-package ru.destroy.primeseller.commands;
+package ru.destroy.primeseller.commands.impl;
 
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -6,15 +6,16 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.destroy.primeseller.PrimeSeller;
+import ru.destroy.primeseller.commands.CommandRegistry;
 import ru.destroy.primeseller.configurations.Config;
 import ru.destroy.primeseller.menu.GuiMenu;
 import ru.destroy.primeseller.util.Chat;
 
+@CommandRegistry(command = "seller")
 public class OpenCommand implements CommandExecutor {
 
     PrimeSeller main;
     public OpenCommand(PrimeSeller main) {
-        main.getCommand("seller").setExecutor(this);
         this.main = main;
     }
 

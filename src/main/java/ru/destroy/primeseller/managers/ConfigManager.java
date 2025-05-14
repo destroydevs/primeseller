@@ -10,7 +10,7 @@ import ru.destroy.primeseller.configurations.Menu;
 
 public class ConfigManager {
 
-    private static final Menu menu = new Menu("menu.yml");
+    private static final Menu menu = new Menu("langs/ru/menu.yml");
     private static final Items items = new Items("items.yml");
     private static final Config config = new Config("config.yml");
     private static final Lang lang = new Lang("lang.yml");
