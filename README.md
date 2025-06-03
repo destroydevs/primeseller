@@ -19,7 +19,7 @@ PrimeSeller is an indispensable tool for any Minecraft server aiming to create a
 # Plugin Installation
 
 ## Download
-1. Go to [Releases](https://github.com/destroydevs/primeseller/releases) or [Spigot](https://www.spigotmc.org/resources/primeseller-advanced-buyer-of-items-1-13-1-21.108813/)
+1. Go to [Releases](https://github.com/destroydevs/primeseller/releases) or [Spigot](https://www.spigotmc.org/resources/108813/))
 2. Download the latest plugin version.
 
 ## Installation
