@@ -15,6 +15,9 @@ import ru.destroy.primeseller.util.Updater;
 @CommandRegistry(command = "primeseller")
 public class MainCommand implements CommandExecutor {
 
+    public MainCommand() {
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!sender.hasPermission("primeseller.admin")) {

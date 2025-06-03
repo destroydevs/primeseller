@@ -4,7 +4,7 @@ import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.destroy.primeseller.configurations.database.MapBase;
+import ru.destroy.primeseller.configurations.data.ItemData;
 import ru.destroy.primeseller.managers.CommandManager;
 import ru.destroy.primeseller.managers.ConfigManager;
 import ru.destroy.primeseller.managers.ListenerManager;
@@ -79,7 +79,7 @@ public final class PrimeSeller extends JavaPlugin {
         msg("&e▀█░█▀ █▀▀ █▀▀█ █▀▀ ░▀░ █▀▀█ █▀▀▄ &bv"+getDescription().getVersion());
         msg("&e░█▄█░ █▀▀ █▄▄▀ ▀▀█ ▀█▀ █░░█ █░░█ &7| &fDeveloper: &dTelegram: &b@byteswing");
         msg("&e░░▀░░ ▀▀▀ ▀░▀▀ ▀▀▀ ▀▀▀ ▀▀▀▀ ▀░░▀ &7| &fServer version: &7(&e"+ ServerVersionUtil.getServerVersion().getMajor()+"."+ServerVersionUtil.getServerVersion().getMinor()+"."+ServerVersionUtil.getServerVersion().getPatch()+"&7)");
-        MapBase sql = new MapBase();
+        ItemData sql = new ItemData();
         sql.clear();
     }
 

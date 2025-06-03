@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import ru.destroy.primeseller.PrimeSeller;
 import ru.destroy.primeseller.configurations.Config;
 import ru.destroy.primeseller.configurations.Items;
-import ru.destroy.primeseller.configurations.database.MapBase;
+import ru.destroy.primeseller.configurations.data.ItemData;
 import ru.destroy.primeseller.menu.SellerMenu;
 
 import java.util.HashMap;
@@ -81,7 +81,7 @@ public class Updater {
     }
 
     public static void update() {
-        MapBase sql = new MapBase();
+        ItemData sql = new ItemData();
         sql.clear();
         for (String s : Config.getConfig().getStringList("messages.update-cast")) {
             Chat.broadcast(s);
@@ -109,7 +109,7 @@ public class Updater {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 Util.playerSellItems.put(p.getUniqueId(), 0);
             }
-            MapBase sql = new MapBase();
+            ItemData sql = new ItemData();
             sql.clearLimited();
             Util.limitedFormat = Util.formattedTime(Items.getConfig().getInt("limited.update"));
             SellerMenu.createLimItems();
@@ -126,7 +126,7 @@ public class Updater {
         try {
             counter.put("unlimited", Items.getConfig().getInt("unlimited.update"));
             Util.update = true;
-            MapBase sql = new MapBase();
+            ItemData sql = new ItemData();
             sql.clearUnLimited();
             Util.unlimitedFormat = Util.formattedTime(Items.getConfig().getInt("unlimited.update"));
             SellerMenu.createUnLimItems();

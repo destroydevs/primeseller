@@ -12,9 +12,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
-import ru.destroy.primeseller.configurations.database.MapBase;
-import ru.destroy.primeseller.configurations.database.SellItem;
-import ru.destroy.primeseller.configurations.database.SkinData;
+import ru.destroy.primeseller.configurations.data.ItemData;
+import ru.destroy.primeseller.entity.Item;
+import ru.destroy.primeseller.configurations.data.SkinData;
 import ru.destroy.primeseller.configurations.Config;
 import ru.destroy.primeseller.configurations.Items;
 import ru.destroy.primeseller.configurations.Menu;
@@ -130,8 +130,8 @@ public class Util {
     }
 
     public static void fillInventory(Inventory inv, List<String> countdown, List<String> unlim, List<String> lim, Player p) {
-        MapBase sql = new MapBase();
-        for (Map.Entry<Integer, SellItem> entry : MapBase.database.entrySet()) {
+        ItemData sql = new ItemData();
+        for (Map.Entry<Integer, Item> entry : ItemData.database.entrySet()) {
             int next = entry.getKey();
             ItemStack item = entry.getValue().getItem().clone();
             if (sql.isLimited(next)) {

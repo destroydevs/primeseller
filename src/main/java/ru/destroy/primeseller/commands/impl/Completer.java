@@ -13,6 +13,9 @@ import java.util.List;
         commandType = CommandType.TAB_COMPLETE)
 public class Completer implements TabCompleter {
 
+    public Completer() {
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         switch (args.length) {

@@ -1,4 +1,4 @@
-package ru.destroy.primeseller.configurations.database;
+package ru.destroy.primeseller.entity;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -6,16 +6,16 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class SellItem implements Cloneable {
-    public static int limit;
-    ItemStack item;
-    int slot;
-    double price;
-    HashMap<UUID, Integer> hashItemLimit = new HashMap<>();
-    int itemLimit;
-    boolean isLimited;
+public class Item implements Cloneable {
+    private static int limit;
+    private final ItemStack item;
+    private final int slot;
+    private double price;
+    private HashMap<UUID, Integer> hashItemLimit = new HashMap<>();
+    private final int itemLimit;
+    private final boolean isLimited;
 
-    public SellItem(ItemStack item, int slot, double price, int itemLimit, boolean isLimited) {
+    public Item(ItemStack item, int slot, double price, int itemLimit, boolean isLimited) {
         this.item = item;
         this.slot = slot;
         this.price = price;
@@ -53,7 +53,7 @@ public class SellItem implements Cloneable {
     }
 
     public static void setLimit(int limit) {
-        SellItem.limit = limit;
+        Item.limit = limit;
     }
     public void addItemLimit(Player p,int count) {
         setItemLimit(p,getPlayerItemLimit(p)+count);
@@ -68,10 +68,10 @@ public class SellItem implements Cloneable {
     }
 
     @Override
-    public SellItem clone() {
+    public Item clone() {
         try {
-            SellItem clone = (SellItem) super.clone();
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            Item clone = (Item) super.clone();
+            clone.hashItemLimit = new HashMap<>();
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

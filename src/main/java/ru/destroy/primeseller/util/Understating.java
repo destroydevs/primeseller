@@ -1,7 +1,7 @@
 package ru.destroy.primeseller.util;
 
 import ru.destroy.primeseller.configurations.Config;
-import ru.destroy.primeseller.configurations.database.MapBase;
+import ru.destroy.primeseller.configurations.data.ItemData;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ public class Understating {
 
     public static void takePrice(int item, int count) {
         if(Config.getConfig().getBoolean("understating-price.enable")) {
-            MapBase h2 = new MapBase();
+            ItemData h2 = new ItemData();
             if(!standardPrice.containsKey(item)) {
                 standardPrice.put(item, h2.getPrice(item));
             }

@@ -5,8 +5,6 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import ru.destroy.primeseller.locale.ConfigurationCreator;
-import ru.destroy.primeseller.locale.Locales;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +25,7 @@ public abstract class AbstractConfig {
     public void loadYaml(Plugin main, Locales lang) {
         file = new File(main.getDataFolder(), configName);
         if (!file.exists()) {
-            ConfigurationCreator.createConfig(configName, lang, main);
+            ConfigurationCreator.createConfig(configName, lang, main.getDataFolder().getAbsolutePath());
         }
 
         config = YamlConfiguration.loadConfiguration(file);

@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import ru.destroy.primeseller.configurations.Items;
 import ru.destroy.primeseller.configurations.Menu;
-import ru.destroy.primeseller.configurations.database.MapBase;
+import ru.destroy.primeseller.configurations.data.ItemData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +35,10 @@ public class SellerMenu {
             int lim = Items.getConfig().getInt("limited.limit-per-items");
             double price = generate(min, max);
             try {
-                MapBase.saveMaterial(new ItemStack(Material.valueOf(item.toUpperCase(Locale.ENGLISH))), unlimSlot, price, lim, false);
+                ItemData.saveMaterial(new ItemStack(Material.valueOf(item.toUpperCase(Locale.ENGLISH))), unlimSlot, price, lim, false);
             } catch (IllegalArgumentException e) {
                 ItemStack itemStack = Items.getConfig().getItemStack("unlimited.items." + item + ".item");
-                MapBase.saveMaterial(itemStack, unlimSlot, price, lim, false);
+                ItemData.saveMaterial(itemStack, unlimSlot, price, lim, false);
             }
             randomItems.remove(random);
         }
@@ -59,10 +59,10 @@ public class SellerMenu {
             int lim = Items.getConfig().getInt("limited.limit-per-items");
             double price = generate(min, max);
             try {
-                MapBase.saveMaterial(new ItemStack(Material.valueOf(item)), limSlots.get(i), price, lim, true);
+                ItemData.saveMaterial(new ItemStack(Material.valueOf(item)), limSlots.get(i), price, lim, true);
             } catch (IllegalArgumentException e) {
                 ItemStack itemStack = Items.getConfig().getItemStack("limited.items."+item+".item");
-                MapBase.saveMaterial(itemStack, limSlots.get(i), price, lim, true);
+                ItemData.saveMaterial(itemStack, limSlots.get(i), price, lim, true);
             }
             randomItems.remove(random);
             if(i == limSlots.size()) {

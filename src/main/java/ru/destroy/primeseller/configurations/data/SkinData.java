@@ -1,4 +1,4 @@
-package ru.destroy.primeseller.configurations.database;
+package ru.destroy.primeseller.configurations.data;
 
 import com.google.gson.annotations.SerializedName;
 

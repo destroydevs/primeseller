@@ -8,8 +8,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import ru.destroy.primeseller.configurations.database.MapBase;
-import ru.destroy.primeseller.configurations.database.SellItem;
+import ru.destroy.primeseller.configurations.data.ItemData;
+import ru.destroy.primeseller.entity.Item;
 import ru.destroy.primeseller.util.Util;
 import ru.destroy.primeseller.PrimeSeller;
 import ru.destroy.primeseller.configurations.Config;
@@ -41,7 +41,7 @@ public class SellerListener implements Listener {
                 e.setCancelled(true);
                 return;
             }
-            MapBase sql = new MapBase();
+            ItemData sql = new ItemData();
             ClickType clickType = e.getClick();
             player.updateInventory();
             handleSellInvSlots(e,player,sql);
@@ -81,7 +81,7 @@ public class SellerListener implements Listener {
         }
     }
 
-    private void handleSellInvSlots(InventoryClickEvent e, Player player,MapBase sql) {
+    private void handleSellInvSlots(InventoryClickEvent e, Player player, ItemData sql) {
         for (Integer i : Menu.getConfig().getIntegerList("sell-inventory.slots")) {
             if (e.getSlot() == i) {
                 sellAllItems(sql, e, player);
@@ -99,8 +99,8 @@ public class SellerListener implements Listener {
         }
     }
 
-    private void sellAction(MapBase sql, InventoryClickEvent e, Player player, int count) {
-        if (MapBase.database.containsKey(e.getSlot())) {
+    private void sellAction(ItemData sql, InventoryClickEvent e, Player player, int count) {
+        if (ItemData.database.containsKey(e.getSlot())) {
             ItemStack item = sql.getSlot(e.getSlot()).getItem().clone();
             int slot = e.getSlot();
             if (count <= 0) {
@@ -151,7 +151,7 @@ public class SellerListener implements Listener {
         }
     }
 
-    private void sellAllItems(MapBase sql, InventoryClickEvent e, Player player) {
+    private void sellAllItems(ItemData sql, InventoryClickEvent e, Player player) {
         double price = 0;
         int amount = 0;
 
@@ -182,7 +182,7 @@ public class SellerListener implements Listener {
                 .replace("%amount%", "x" + amount));
     }
 
-    private Data sellUnLimited(Player player, MapBase sql) {
+    private Data sellUnLimited(Player player, ItemData sql) {
         double price = 0;
         int amount = 0;
         for (ItemStack item : player.getInventory().getContents()) {
@@ -190,7 +190,7 @@ public class SellerListener implements Listener {
                 continue;
             }
 
-            for (Map.Entry<Integer, SellItem> d : MapBase.database.entrySet()) {
+            for (Map.Entry<Integer, Item> d : ItemData.database.entrySet()) {
                 if (!d.getValue().isLimited()) {
                     ItemStack itemStack = d.getValue().getItem().clone();
 
@@ -213,7 +213,7 @@ public class SellerListener implements Listener {
         return new Data(price,amount);
     }
 
-    private Data sellLimited(Player player, MapBase sql) {
+    private Data sellLimited(Player player, ItemData sql) {
         double price = 0;
         int amount = 0;
         for (ItemStack item : player.getInventory().getContents()) {
@@ -221,7 +221,7 @@ public class SellerListener implements Listener {
                 continue;
             }
 
-            for (Map.Entry<Integer, SellItem> d : MapBase.database.entrySet()) {
+            for (Map.Entry<Integer, Item> d : ItemData.database.entrySet()) {
                 if (d.getValue().isLimited()) {
                     ItemStack itemStack = d.getValue().getItem().clone();
 

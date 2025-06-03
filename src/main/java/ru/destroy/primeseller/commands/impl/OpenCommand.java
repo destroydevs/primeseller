@@ -14,9 +14,7 @@ import ru.destroy.primeseller.util.Chat;
 @CommandRegistry(command = "seller")
 public class OpenCommand implements CommandExecutor {
 
-    PrimeSeller main;
-    public OpenCommand(PrimeSeller main) {
-        this.main = main;
+    public OpenCommand() {
     }
 
     @Override
