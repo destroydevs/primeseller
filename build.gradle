@@ -28,6 +28,8 @@ dependencies {
     runtimeOnly 'com.h2database:h2:1.4.190'
     implementation 'com.github.Anon8281:UniversalScheduler:0.1.6'
 
+    implementation 'org.reflections:reflections:0.10.2'
+
     jmhImplementation 'org.openjdk.jmh:jmh-core:1.37'
     jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 }
