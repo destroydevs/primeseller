@@ -15,6 +15,7 @@ PrimeSeller is an indispensable tool for any Minecraft server aiming to create a
 11. Limited and unlimited buyer 
 12. Intuitive for players 
 13. Supports all Minecraft versions 1.13+
+14. [Pumpkin](https://github.com/Pumpkin-MC/Pumpkin) support in future.
 
 # Plugin Installation
 
