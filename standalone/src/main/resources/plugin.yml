@@ -1,6 +1,14 @@
 name: PrimeSeller
-version: '${version}'
+version: '2.4.7'
 main: me.byteswing.primeseller.PrimeSeller
-api-version: '1.16'
+api-version: 1.13
 depend: [ Vault ]
-authors: [ byteswing ]
+softdepend: [ PlaceholderAPI ]
+commands:
+  seller:
+    aliases:
+      - 'sell'
+      - 'buyer'
+  PrimeSeller:
+    aliases:
+      - 'psell'
