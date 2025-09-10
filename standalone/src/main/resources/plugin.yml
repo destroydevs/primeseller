@@ -1,0 +1,6 @@
+name: PrimeSeller
+version: '${version}'
+main: me.byteswing.primeseller.PrimeSeller
+api-version: '1.16'
+depend: [ Vault ]
+authors: [ byteswing ]
