@@ -1,3 +1,3 @@
 rootProject.name = 'PrimeSeller'
-include 'standalone'
-include 'common'
+include 'primeseller-standalone'
+include 'primeseller-common'

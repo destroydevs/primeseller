@@ -14,8 +14,8 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":standalone"))
+    implementation(project(":primeseller-common"))
+    implementation(project(":primeseller-standalone"))
 }
 
 def targetJavaVersion = 17
