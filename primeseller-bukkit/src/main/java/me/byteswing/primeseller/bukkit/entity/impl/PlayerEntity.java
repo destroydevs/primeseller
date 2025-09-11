@@ -7,26 +7,30 @@ import java.util.UUID;
 
 public class PlayerEntity implements IPlayerEntity {
     private final UUID uuid;
-    private Player player;
+    private final Player player;
     private String group;
     private int playerLimit;
     private int itemsSold;
-    private boolean isAutoBuyEnabled;
+    private boolean isAutoSellEnabled;
 
-    public PlayerEntity(UUID uuid) {
+    // todo: create factory for easy player creating
+    public PlayerEntity(UUID uuid, Player player, String group, int playerLimit, int itemsSold, boolean isAutoBuyEnabled) {
         this.uuid = uuid;
-
-        // todo: find all things by player uuid
+        this.player = player;
+        this.group = group;
+        this.playerLimit = playerLimit;
+        this.itemsSold = itemsSold;
+        this.isAutoSellEnabled = isAutoBuyEnabled;
     }
 
     @Override
     public Player getPlayer() {
-        return null;
+        return this.player;
     }
 
     @Override
     public String getPlayerGroup() {
-        return "";
+        return this.group;
     }
 
     @Override
@@ -36,26 +40,31 @@ public class PlayerEntity implements IPlayerEntity {
 
     @Override
     public int getPlayerLimit() {
-        return 0;
+        return this.playerLimit;
     }
 
     @Override
-    public int setPlayerLimit() {
-        return 0;
+    public void setPlayerLimit(int limit) {
+        this.playerLimit = limit;
     }
 
     @Override
-    public int getPlayerSells() {
-        return 0;
+    public int getPlayerSold() {
+        return this.itemsSold;
     }
 
     @Override
-    public int setPlayerSells() {
-        return 0;
+    public void setPlayerSold(int sold) {
+        this.itemsSold = sold;
     }
 
     @Override
     public boolean isAutoSellEnabled() {
-        return false;
+        return this.isAutoSellEnabled;
+    }
+
+    @Override
+    public void setAutoSellEnabled(boolean enabled) {
+        this.isAutoSellEnabled = enabled;
     }
 }

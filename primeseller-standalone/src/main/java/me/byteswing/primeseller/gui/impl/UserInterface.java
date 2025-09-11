@@ -7,13 +7,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public class UserInterface implements IUserInterface {
-    private final PlayerEntity playerEntity;
+    //private final PlayerEntity playerEntity;
     private final Player player;
     // todo: schedulers
     private Inventory inventory;
 
     public UserInterface(Player player) {
-        this.playerEntity = new PlayerEntity(player.getUniqueId());
+        // todo: get from factory
+        // this.playerEntity = new PlayerEntity(player.getUniqueId());
         this.player = player;
         // todo: cfg
         this.inventory = Bukkit.createInventory(null, 4*9, "Title");

@@ -7,15 +7,15 @@ public interface IRawPlayerEntity {
     UUID getUUID();
 
     int getPlayerLimit();
-    int setPlayerLimit();
+    void setPlayerLimit(int limit);
 
     /**
      * @return Amount of sold items by player
      */
-    int getPlayerSells();
-    int setPlayerSells();
+    int getPlayerSold();
+    void setPlayerSold(int sold);
 
     boolean isAutoSellEnabled();
-
+    void setAutoSellEnabled(boolean enabled);
 
 }
