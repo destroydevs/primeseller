@@ -9,18 +9,26 @@ public class PlayerEntity implements IPlayerEntity {
     private final UUID uuid;
     private final Player player;
     private String group;
-    private int playerLimit;
+    private int playerUsedLimit;
+    private final int playerTotalLimit;
     private int itemsSold;
     private boolean isAutoSellEnabled;
 
     // todo: create factory for easy player creating
-    public PlayerEntity(UUID uuid, Player player, String group, int playerLimit, int itemsSold, boolean isAutoBuyEnabled) {
+    public PlayerEntity(UUID uuid,
+                        Player player,
+                        String group,
+                        int playerUsedLimit,
+                        int playerTotalLimit,
+                        int itemsSold,
+                        boolean isAutoSellEnabled) {
         this.uuid = uuid;
         this.player = player;
         this.group = group;
-        this.playerLimit = playerLimit;
+        this.playerUsedLimit = playerUsedLimit;
+        this.playerTotalLimit = playerTotalLimit;
         this.itemsSold = itemsSold;
-        this.isAutoSellEnabled = isAutoBuyEnabled;
+        this.isAutoSellEnabled = isAutoSellEnabled;
     }
 
     @Override
@@ -34,18 +42,28 @@ public class PlayerEntity implements IPlayerEntity {
     }
 
     @Override
+    public void setPlayerGroup(String group) {
+        this.group = group;
+    }
+
+    @Override
     public UUID getUUID() {
         return this.uuid;
     }
 
     @Override
-    public int getPlayerLimit() {
-        return this.playerLimit;
+    public int getUsedLimit() {
+        return this.playerUsedLimit;
     }
 
     @Override
-    public void setPlayerLimit(int limit) {
-        this.playerLimit = limit;
+    public int getTotalLimit() {
+        return this.playerTotalLimit;
+    }
+
+    @Override
+    public void setUsedLimit(int limit) {
+        this.playerUsedLimit = limit;
     }
 
     @Override
