@@ -15,11 +15,10 @@ public class PlayerJoinListener implements Listener {
     }
 
     @EventHandler
-    public void onJoin(PlayerJoinEvent e) {
-        Player p = e.getPlayer();
-        if(!Util.playerSellItems.containsKey(p.getUniqueId())) {
-            Util.playerSellItems.put(p.getUniqueId(), 0);
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (!Util.playerSellItems.containsKey(player.getUniqueId())) {
+            Util.playerSellItems.put(player.getUniqueId(), 0);
         }
     }
-
 }

@@ -9,7 +9,7 @@ public class MapBase {
     public static final LinkedHashMap<Integer, SellItem> database = new LinkedHashMap<>();
 
     public static void saveMaterial(ItemStack item, int slot, double p, int limit, boolean limited) {
-        database.put(slot,new SellItem(item,slot,p,limit,limited));
+        database.put(slot, new SellItem(item, slot, p, limit, limited));
     }
 
     public SellItem getSlot(int slot) {
@@ -25,15 +25,6 @@ public class MapBase {
         item.setPrice(p);
     }
 
-    public void takePrice(int slot, double p) {
-        double newPrice = getPrice(slot)-p;
-        setPrice(slot,newPrice);
-    }
-    public void addPrice(int slot, double p) {
-        double newPrice = getPrice(slot)+p;
-        setPrice(slot,newPrice);
-    }
-
     public void clear() {
         database.clear();
     }
@@ -41,6 +32,7 @@ public class MapBase {
     public void clearLimited() {
         database.keySet().removeIf(this::isLimited);
     }
+
     public void clearUnLimited() {
         database.keySet().removeIf(s -> !isLimited(s));
     }
@@ -48,5 +40,4 @@ public class MapBase {
     public boolean isLimited(int slot) {
         return getSlot(slot).isLimited();
     }
-
 }

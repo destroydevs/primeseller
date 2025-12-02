@@ -1,17 +1,14 @@
 package me.byteswing.primeseller.menu;
 
-import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
+import me.byteswing.primeseller.configurations.Config;
+import me.byteswing.primeseller.tasks.PlayerGUITask;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import me.byteswing.primeseller.PrimeSeller;
-import me.byteswing.primeseller.configurations.Menu;
 import me.byteswing.primeseller.util.Chat;
-import me.byteswing.primeseller.util.Updater;
 import me.byteswing.primeseller.util.Util;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,84 +16,61 @@ import java.util.List;
 import java.util.UUID;
 
 public class GuiMenu {
+    private static final HashMap<UUID, BukkitTask> tasks = new HashMap<>();
 
-    public static final HashMap<UUID, MyScheduledTask> tasks = new HashMap<>();
+    public static void open(Player player, PrimeSeller plugin) {
+        UUID playerId = player.getUniqueId();
+        Inventory inv = Bukkit.createInventory(
+                new SellerInventoryHolder(null),
+                Config.getMenuConfig().getInt("size"),
+                Chat.toComponent(Config.getMenuConfig().getString("title", "title"))
+        );
 
-    public static void open(Player p, PrimeSeller main) {
-        Inventory inv = Bukkit.createInventory(p, Menu.getConfig().getInt("size"), "§7§0"+Chat.color(Menu.getConfig().getString("title")));
-        List<String> unlim = new ArrayList<>();
-        List<String> lim = new ArrayList<>();
-        List<String> countdown = new ArrayList<>();
-        if(!Util.playerSellItems.containsKey(p.getUniqueId())) {
-            Util.playerSellItems.put(p.getUniqueId(), 0);
+        if (!Util.playerSellItems.containsKey(playerId)) {
+            Util.playerSellItems.put(playerId, 0);
         }
 
         try {
-            Util.fillInventory(inv, countdown, unlim, lim, p);
+            Util.fillInventory(inv, player, plugin);
         } catch (NullPointerException e) {
-            p.sendMessage("Предметы скупщика всё ещё загружаются... Подождите.");
+            Chat.sendMessage(player, Config.getMessage("items-loading"));
             return;
         }
 
-        if(!tasks.containsKey(p.getUniqueId())) {
-            tasks.put(p.getUniqueId(), PrimeSeller.getScheduler().runTaskTimer(() -> {
-                PrimeSeller.getScheduler().runTaskTimer(()-> {
-                    if (Util.update && tasks.containsKey(p.getUniqueId())) {
-                        try {
-                            Util.fillInventory(inv, countdown, unlim, lim, p);
-                        } catch (NullPointerException e) {
-                            return;
-                        }
-                        Util.update = false;
-                    }
-                },0,20);
-
-
-                for (Integer i : Menu.getConfig().getIntegerList("countdown.slots")) {
-                    String name = Menu.getConfig().getString("countdown.material");
-                    int modelId = Menu.getConfig().getInt("countdown.model-data",0);
-                    ItemStack item = new ItemStack(Material.BARRIER);
-                    if(name != null) {
-                        if (name.startsWith("basehead-")) {
-                            String url = name.replace("basehead-", "");
-                            item = Util.getSkull(url);
-                        } else {
-                            item = new ItemStack(Material.valueOf(name));
-                        }
-                    }
-                    ItemMeta meta = item.getItemMeta();
-                    for (String s : Menu.getConfig().getStringList("countdown.lore")) {
-                        countdown.add(Chat.color(s
-                                .replace("%lim-time%", Updater.getLimitedTime(2))
-                                .replace("%unlim-time%", Updater.getUnLimitedTime(2))
-                                .replace("%lim-time-format%", Util.limitedFormat)
-                                .replace("%unlim-time-format%", Util.unlimitedFormat)));
-                    }
-                    meta.setLore(countdown);
-                    meta.setCustomModelData(modelId);
-                    name = Menu.getConfig().getString("countdown.name");
-                    meta.setDisplayName(Chat.color(name));
-                    item.setItemMeta(meta);
-                    inv.setItem(i, item);
-                    countdown.clear();
-                }
-            }, 0, 20));
+        if (!tasks.containsKey(playerId)) {
+            tasks.put(playerId, new PlayerGUITask(plugin, inv, player).runTaskTimer(plugin, 0, 20));
         }
-        p.openInventory(inv);
+        player.openInventory(inv);
     }
 
-    public static void update(Player p, Inventory inv) {
-        List<String> unlim = new ArrayList<>();
-        List<String> lim = new ArrayList<>();
-        List<String> countdown = new ArrayList<>();
-        if(!Util.playerSellItems.containsKey(p.getUniqueId())) {
-            Util.playerSellItems.put(p.getUniqueId(), 0);
+    public static void update(Player player, Inventory inv, PrimeSeller plugin) {
+        if (!SellerInventoryHolder.isSellerInventory(inv)) {
+            return;
         }
+
+        if (!Util.playerSellItems.containsKey(player.getUniqueId())) {
+            Util.playerSellItems.put(player.getUniqueId(), 0);
+        }
+
         try {
-            Util.fillInventory(inv, countdown, unlim, lim, p);
+            Util.fillInventory(inv, player, plugin);
         } catch (NullPointerException e) {
             return;
         }
-        p.updateInventory();
+        player.updateInventory();
+    }
+
+    public static void deleteTask(UUID playerId) {
+        BukkitTask task = tasks.remove(playerId);
+        if (task != null) {
+            task.cancel();
+        }
+    }
+
+    public static void disable() {
+        List<UUID> playerIds = new ArrayList<>(tasks.keySet());
+        for (UUID playerId : playerIds) {
+            deleteTask(playerId);
+        }
     }
 }

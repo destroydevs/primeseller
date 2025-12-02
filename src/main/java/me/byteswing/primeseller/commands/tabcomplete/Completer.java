@@ -11,18 +11,22 @@ import java.util.List;
 public class Completer implements TabCompleter {
 
     public Completer(PrimeSeller main) {
-        main.getCommand("PrimeSeller").setTabCompleter(this);
+        main.getCommand("primeseller").setTabCompleter(this);
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if(args.length == 1) {
+        if (args.length == 1) {
             return Arrays.asList("update", "reload", "addlimited", "addunlimited");
         }
-        if(args.length == 2 && args[0].equalsIgnoreCase("addlimited") || args[0].equalsIgnoreCase("addunlimited")) {
+        if (args.length == 2 && args[0].equalsIgnoreCase("update")) {
+            return Arrays.asList("limited", "unlimited");
+        }
+        boolean isAddUnlimited = args[0].equalsIgnoreCase("addlimited") || args[0].equalsIgnoreCase("addunlimited");
+        if (args.length == 2 && isAddUnlimited) {
             return Arrays.asList("10", "50", "100");
         }
-        if(args.length == 3 && args[0].equalsIgnoreCase("addlimited") || args[0].equalsIgnoreCase("addunlimited")) {
+        if (args.length == 3 && isAddUnlimited) {
             return Arrays.asList("100", "500", "1000");
         }
         return null;

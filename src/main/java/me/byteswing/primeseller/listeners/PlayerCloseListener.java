@@ -17,10 +17,7 @@ public class PlayerCloseListener implements Listener {
 
     @EventHandler
     public void onClose(InventoryCloseEvent e) {
-        UUID id = e.getPlayer().getUniqueId();
-        if(GuiMenu.tasks.containsKey(id)) {
-            GuiMenu.tasks.get(id).cancel();
-            GuiMenu.tasks.remove(id);
-        }
+        UUID playerId = e.getPlayer().getUniqueId();
+        GuiMenu.deleteTask(playerId);
     }
 }

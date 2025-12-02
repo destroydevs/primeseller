@@ -1,42 +1,34 @@
 package me.byteswing.primeseller.util;
 
+import me.byteswing.primeseller.PrimeSeller;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
 public class Chat {
-    public static String color(String from) {
-        Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
-        for(Matcher matcher = pattern.matcher(from); matcher.find(); matcher = pattern.matcher(from)) {
-            String hexCode = from.substring(matcher.start(), matcher.end());
-            String replaceSharp = hexCode.replace('#', 'x');
-            char[] ch = replaceSharp.toCharArray();
-            StringBuilder builder = new StringBuilder();
-            for (char c : ch) {
-                builder.append("&").append(c);
-            }
-            from = from.replace(hexCode, builder.toString());
-        }
+    private static String prefix = "";
+    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
 
-        return ChatColor.translateAlternateColorCodes('&', from);
+    public static void init(PrimeSeller plugin) {
+        prefix = plugin.getConfig().getString("prefix", "<gradient:#5637bc:#9258ff>SELLER</gradient> <#b9b9b9>|");
     }
 
-    public static void sendMessage(Player p, String msg) {
-        p.sendMessage(color(msg));
+    public static Component toComponent(@NotNull String message) {
+        return miniMessage.deserialize(message);
     }
 
-    public static void sendMessage(CommandSender s, String msg) {
-        s.sendMessage(color(msg));
+    public static void sendMessage(CommandSender sender, String msg) {
+        if (msg == null || msg.isEmpty()) return;
+        sender.sendMessage(toComponent(prefix + " " + msg));
     }
 
-    public static void broadcast(String msg) {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            sendMessage(p, msg);
-        }
-
+    public static void broadcast(List<String> messages) {
+        if (messages.isEmpty()) return;
+        String combinedMessage = String.join("\n", messages);
+        Bukkit.broadcast(toComponent(combinedMessage));
     }
 }

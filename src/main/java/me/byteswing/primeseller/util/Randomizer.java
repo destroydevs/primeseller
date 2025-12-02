@@ -10,8 +10,8 @@ public class Randomizer {
 
         StringBuilder builder = new StringBuilder();
 
-        for(int i =0; i<length;i++) {
-            int c = (int) (Math.random()*chars.length);
+        for (int i = 0; i < length; i++) {
+            int c = (int) (Math.random() * chars.length);
             builder.append(chars[c]);
         }
         return builder.toString();

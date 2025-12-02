@@ -44,8 +44,8 @@ public class SellItem implements Cloneable {
     }
 
     public int getPlayerItemLimit(Player p) {
-        hashItemLimit.putIfAbsent(p.getUniqueId(),0);
-        return hashItemLimit.getOrDefault(p.getUniqueId(),0);
+        hashItemLimit.putIfAbsent(p.getUniqueId(), 0);
+        return hashItemLimit.getOrDefault(p.getUniqueId(), 0);
     }
 
     public boolean isLimited() {
@@ -55,8 +55,9 @@ public class SellItem implements Cloneable {
     public static void setLimit(int limit) {
         SellItem.limit = limit;
     }
-    public void addItemLimit(Player p,int count) {
-        setItemLimit(p,getPlayerItemLimit(p)+count);
+
+    public void addItemLimit(Player p, int count) {
+        setItemLimit(p, getPlayerItemLimit(p) + count);
     }
 
     public void setPrice(double price) {
@@ -64,15 +65,14 @@ public class SellItem implements Cloneable {
     }
 
     public void setItemLimit(Player p, int itemLimit) {
-        hashItemLimit.put(p.getUniqueId(),itemLimit);
+        hashItemLimit.put(p.getUniqueId(), itemLimit);
     }
 
     @Override
     public SellItem clone() {
         try {
-            SellItem clone = (SellItem) super.clone();
             // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return clone;
+            return (SellItem) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

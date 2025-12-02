@@ -1,5 +1,18 @@
 package me.byteswing.primeseller.listeners;
 
+import me.byteswing.primeseller.managers.EconomyManager;
+import me.byteswing.primeseller.managers.LanguageManager;
+import me.byteswing.primeseller.menu.AutoSellMenu;
+import me.byteswing.primeseller.menu.SellerInventoryHolder;
+import me.byteswing.primeseller.PrimeSeller;
+import me.byteswing.primeseller.configurations.Config;
+import me.byteswing.primeseller.configurations.Items;
+import me.byteswing.primeseller.configurations.database.MapBase;
+import me.byteswing.primeseller.configurations.database.SellItem;
+import me.byteswing.primeseller.menu.GuiMenu;
+import me.byteswing.primeseller.util.Chat;
+import me.byteswing.primeseller.util.Understating;
+import me.byteswing.primeseller.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -8,43 +21,37 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import me.byteswing.primeseller.PrimeSeller;
-import me.byteswing.primeseller.configurations.Config;
-import me.byteswing.primeseller.configurations.Items;
-import me.byteswing.primeseller.configurations.Menu;
-import me.byteswing.primeseller.configurations.database.MapBase;
-import me.byteswing.primeseller.configurations.database.SellItem;
-import me.byteswing.primeseller.menu.GuiMenu;
-import me.byteswing.primeseller.util.Chat;
-import me.byteswing.primeseller.util.Eco;
-import me.byteswing.primeseller.util.Understating;
-import me.byteswing.primeseller.util.Util;
 
 import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.Map;
 
 public class SellerListener implements Listener {
-
+    private static PrimeSeller plugin;
     private final DecimalFormat format = new DecimalFormat("##.##");
 
-    public SellerListener(PrimeSeller main) {
-        Bukkit.getPluginManager().registerEvents(this, main);
+    public SellerListener(PrimeSeller plugin) {
+        SellerListener.plugin = plugin;
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if (e.getView().getTitle().equals("§7§0" + Chat.color(Menu.getConfig().getString("title")))) {
+        if (SellerInventoryHolder.isSellerInventory(e.getView().getTopInventory())) {
             Player player = (Player) e.getWhoClicked();
             e.setCancelled(true);
+
             if (e.getClickedInventory() == player.getInventory()) {
                 e.setCancelled(true);
                 return;
             }
+
             MapBase sql = new MapBase();
             ClickType clickType = e.getClick();
             player.updateInventory();
-            handleSellInvSlots(e,player,sql);
+
+            handleSellInvSlots(e, player, sql);
+            handleAutoSellInvSlots(e, player);
             handleExitSlots(e, player);
             handleCountdownSlots(e, player);
 
@@ -52,10 +59,6 @@ public class SellerListener implements Listener {
                 sellAction(sql, e, player, 1);
             } else if (clickType == ClickType.RIGHT) {
                 sellAction(sql, e, player, 64);
-            } else if (Config.getConfig().getBoolean("middle-click-sell-all")) {
-                if (clickType == ClickType.MIDDLE) {
-                    sellAction(sql, e, player, Util.calc(player, sql.getSlot(e.getSlot()).getItem()));
-                }
             } else {
                 if (clickType == ClickType.SHIFT_LEFT) {
                     sellAction(sql, e, player, Util.calc(player, sql.getSlot(e.getSlot()).getItem()));
@@ -65,9 +68,9 @@ public class SellerListener implements Listener {
     }
 
     private void handleExitSlots(InventoryClickEvent e, Player player) {
-        for (Integer i : Menu.getConfig().getIntegerList("exit.slots")) {
+        for (Integer i : Config.getMenuConfig().getIntegerList("exit.slots")) {
             if (e.getSlot() == i) {
-                for (String s : Menu.getConfig().getStringList("exit.commands")) {
+                for (String s : Config.getMenuConfig().getStringList("exit.commands")) {
                     if (s.startsWith("[cmd]")) {
                         String cmd = s.replace("[cmd]", "").replace("[cmd] ", "");
                         player.performCommand(cmd);
@@ -77,24 +80,38 @@ public class SellerListener implements Listener {
                     }
                 }
                 e.setCancelled(true);
+                break;
             }
         }
     }
 
-    private void handleSellInvSlots(InventoryClickEvent e, Player player,MapBase sql) {
-        for (Integer i : Menu.getConfig().getIntegerList("sell-inventory.slots")) {
+    private void handleSellInvSlots(InventoryClickEvent e, Player player, MapBase sql) {
+        for (Integer i : Config.getMenuConfig().getIntegerList("sell-inventory.slots")) {
             if (e.getSlot() == i) {
                 sellAllItems(sql, e, player);
                 e.setCancelled(true);
+                break;
             }
         }
     }
 
     private void handleCountdownSlots(InventoryClickEvent e, Player player) {
-        for (Integer i : Menu.getConfig().getIntegerList("countdown.slots")) {
+        for (Integer i : Config.getMenuConfig().getIntegerList("countdown.slots")) {
             if (e.getSlot() == i) {
-                GuiMenu.update(player, e.getClickedInventory());
+                GuiMenu.update(player, e.getClickedInventory(), plugin);
                 e.setCancelled(true);
+                break;
+            }
+        }
+    }
+
+    private void handleAutoSellInvSlots(InventoryClickEvent e, Player player) {
+        if (!player.hasPermission("primeseller.autoseller")) return;
+        for (Integer i : Config.getMenuConfig().getIntegerList("autosell.slots")) {
+            if (e.getSlot() == i) {
+                AutoSellMenu.openAutoSellMenu(player, plugin);
+                e.setCancelled(true);
+                break;
             }
         }
     }
@@ -104,13 +121,13 @@ public class SellerListener implements Listener {
             ItemStack item = sql.getSlot(e.getSlot()).getItem().clone();
             int slot = e.getSlot();
             if (count <= 0) {
-                Chat.sendMessage(player, Config.getConfig().getString("messages.amount"));
+                Chat.sendMessage(player, Config.getMessage("amount"));
                 e.setCancelled(true);
                 return;
             }
 
             if (!player.getInventory().containsAtLeast(item, count)) {
-                Chat.sendMessage(player, Config.getConfig().getString("messages.amount"));
+                Chat.sendMessage(player, Config.getMessage("amount"));
                 e.setCancelled(true);
                 return;
             }
@@ -128,7 +145,7 @@ public class SellerListener implements Listener {
                 }
 
                 if (count <= 0) {
-                    Chat.sendMessage(player, Config.getConfig().getString("messages.limit"));
+                    Chat.sendMessage(player, Config.getMessage("limit"));
                     e.setCancelled(true);
                     return;
                 }
@@ -139,14 +156,14 @@ public class SellerListener implements Listener {
 
             double price = Double.parseDouble(format.format(sql.getPrice(slot) * count).replace(",", "."));
             Understating.takePrice(slot, count);
-            Chat.sendMessage(e.getWhoClicked(), Config.getConfig().getString("messages.sell")
-                    .replace("%item%", item.getType().toString())
-                    .replace("%price%", String.valueOf(price))
+            Chat.sendMessage(e.getWhoClicked(), Config.getMessage("sell")
+                    .replace("%item%", LanguageManager.translate(item.getType()))
+                    .replace("%price%", EconomyManager.format(price))
                     .replace("%amount%", "x" + count));
             item.setAmount(count);
             player.getInventory().removeItem(item);
-            Eco.getEconomy().depositPlayer(player, price);
-            GuiMenu.update(player, e.getClickedInventory());
+            EconomyManager.addBalance(player, price);
+            GuiMenu.update(player, e.getClickedInventory(), plugin);
             e.setCancelled(true);
         }
     }
@@ -163,22 +180,22 @@ public class SellerListener implements Listener {
             }
 
             if (type.equals("LIMITED")) {
-                Data lim = sellLimited(player,sql);
-                Data unlim = sellUnLimited(player,sql);
-                amount+=lim.amount+unlim.amount;
-                price+=lim.price+unlim.price;
+                Data lim = sellLimited(player, sql);
+                Data unlim = sellUnLimited(player, sql);
+                amount += lim.amount + unlim.amount;
+                price += lim.price + unlim.price;
             }
             if (type.equals("UNLIMITED")) {
-                Data unlim = sellUnLimited(player,sql);
-                Data lim = sellLimited(player,sql);
-                amount+=lim.amount+unlim.amount;
-                price+=lim.price+unlim.price;
+                Data unlim = sellUnLimited(player, sql);
+                Data lim = sellLimited(player, sql);
+                amount += lim.amount + unlim.amount;
+                price += lim.price + unlim.price;
             }
         }
 
-        Eco.getEconomy().depositPlayer(player, price);
-        Chat.sendMessage(e.getWhoClicked(), Config.getConfig().getString("messages.sell-inventory")
-                .replace("%price%", format.format(price).replace(",", "."))
+        EconomyManager.addBalance(player, price);
+        Chat.sendMessage(e.getWhoClicked(), Config.getMessage("sell-inventory")
+                .replace("%price%", EconomyManager.format(price))
                 .replace("%amount%", "x" + amount));
     }
 
@@ -210,7 +227,7 @@ public class SellerListener implements Listener {
                 }
             }
         }
-        return new Data(price,amount);
+        return new Data(price, amount);
     }
 
     private Data sellLimited(Player player, MapBase sql) {
@@ -259,7 +276,7 @@ public class SellerListener implements Listener {
                 }
             }
         }
-        return new Data(price,amount);
+        return new Data(price, amount);
     }
 
     public static class Data {
@@ -271,6 +288,4 @@ public class SellerListener implements Listener {
             this.amount = amount;
         }
     }
-
-
 }

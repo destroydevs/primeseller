@@ -14,31 +14,32 @@ public class Expansions extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getAuthor() {
-        return "destroydev";
+        return "destroydev, golovin12";
     }
 
     @Override
     public @NotNull String getVersion() {
         return "1.0";
     }
+
     @Override
     public String onRequest(OfflinePlayer player, String params) {
-        if(params.equalsIgnoreCase("unlimited_time_formatted")) {
+        if (params.equalsIgnoreCase("unlimited_time_formatted")) {
             return Util.unlimitedFormat;
         }
-        if(params.equalsIgnoreCase("unlimited_time")) {
-            return Updater.getUnLimitedTime(2);
+        if (params.equalsIgnoreCase("unlimited_time")) {
+            return Updater.getUnLimitedTime();
         }
-        if(params.equalsIgnoreCase("limited_time_formatted")) {
+        if (params.equalsIgnoreCase("limited_time_formatted")) {
             return Util.limitedFormat;
         }
-        if(params.equalsIgnoreCase("limited_time")) {
-            return Updater.getLimitedTime(2);
+        if (params.equalsIgnoreCase("limited_time")) {
+            return Updater.getLimitedTime();
         }
-        if(params.equalsIgnoreCase("selled_items")) {
+        if (params.equalsIgnoreCase("selled_items")) {
             return Util.playerSellItems.get(player.getUniqueId()).toString();
         }
 
-        return null; // Placeholder is unknown by the Expansion
+        return null;
     }
 }

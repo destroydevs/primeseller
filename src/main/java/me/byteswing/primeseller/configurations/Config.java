@@ -1,37 +1,38 @@
 package me.byteswing.primeseller.configurations;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import me.byteswing.primeseller.locale.ConfigurationCreator;
 
-import java.io.File;
-import java.io.IOException;
 
 public class Config {
-
-    private static File file;
+    private static Plugin plugin;
     private static FileConfiguration config;
 
-    public void loadConfigYaml(Plugin main) {
-        file = new File(main.getDataFolder(), "config.yml");
-        if (!file.exists()) {
-            ConfigurationCreator.createConfig("config.yml",main);
-        }
-        config = YamlConfiguration.loadConfiguration(file);
+    public void loadConfig(Plugin main) {
+        plugin = main;
+        plugin.saveDefaultConfig();
+        config = plugin.getConfig();
     }
 
     public static void reloadConfig() {
-        try {
-            config.load(file);
-        } catch (IOException | InvalidConfigurationException e) {
-            Bukkit.getLogger().warning("Не удалось загрузить config.yml!");
-        }
+        plugin.reloadConfig();
+        config = plugin.getConfig();
     }
 
     public static FileConfiguration getConfig() {
         return config;
+    }
+
+    public static ConfigurationSection getMenuConfig() {
+        return config.getConfigurationSection("menu");
+    }
+
+    public static ConfigurationSection getAutoSellConfig() {
+        return config.getConfigurationSection("autosell-gui");
+    }
+
+    public static String getMessage(String key) {
+        return config.getString("messages." + key, "<red>message-" + key + ": not found");
     }
 }

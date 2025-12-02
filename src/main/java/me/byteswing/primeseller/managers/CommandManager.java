@@ -1,10 +1,11 @@
 package me.byteswing.primeseller.managers;
 
 import me.byteswing.primeseller.PrimeSeller;
+import me.byteswing.primeseller.commands.AutoSellerCommand;
 import me.byteswing.primeseller.commands.OpenCommand;
 import me.byteswing.primeseller.commands.PrimeSellerCommands;
+import me.byteswing.primeseller.commands.tabcomplete.AutoSellCompleter;
 import me.byteswing.primeseller.commands.tabcomplete.Completer;
-import me.byteswing.primeseller.managers.Manager;
 
 public class CommandManager implements Manager {
     @Override
@@ -12,5 +13,7 @@ public class CommandManager implements Manager {
         new OpenCommand(plugin);
         new PrimeSellerCommands(plugin);
         new Completer(plugin);
+        new AutoSellerCommand(plugin);
+        new AutoSellCompleter(plugin);
     }
 }

@@ -1,46 +1,46 @@
 package me.byteswing.primeseller.util;
 
-import com.google.gson.Gson;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
+import com.destroystokyo.paper.profile.ProfileProperty;
+import me.byteswing.primeseller.PrimeSeller;
+import me.byteswing.primeseller.configurations.Config;
+import me.byteswing.primeseller.configurations.Items;
+import me.byteswing.primeseller.configurations.database.MapBase;
+import me.byteswing.primeseller.configurations.database.SellItem;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import me.byteswing.primeseller.managers.AutoSellManager;
+import me.byteswing.primeseller.managers.EconomyManager;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.profile.PlayerProfile;
-import org.bukkit.profile.PlayerTextures;
-import me.byteswing.primeseller.configurations.Config;
-import me.byteswing.primeseller.configurations.Items;
-import me.byteswing.primeseller.configurations.Menu;
-import me.byteswing.primeseller.configurations.database.MapBase;
-import me.byteswing.primeseller.configurations.database.SellItem;
-import me.byteswing.primeseller.configurations.database.SkinData;
 
-import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Util {
 
     public static boolean update = false;
-    
-    private static final DecimalFormat format = new DecimalFormat("##.##");
 
     public static HashMap<UUID, Integer> playerSellItems = new HashMap<>();
 
-    public static String limitedFormat = "Загрузка...";
-    public static String unlimitedFormat = "Загрузка...";
+    public static String limitedFormat = "Loading...";
+    public static String unlimitedFormat = "Loading...";
 
     public static String formattedTime(int time) {
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yy HH:mm");
-        long a = time* 1000L;
+        String defaultFormat = "yy-MM-dd HH:mm";
+        String fmt = Config.getConfig().getString("datetime-format", defaultFormat);
+        SimpleDateFormat format;
+        try {
+            format = new SimpleDateFormat(fmt);
+        } catch (IllegalArgumentException ex) {
+            format = new SimpleDateFormat(defaultFormat);
+        }
+        long milliseconds = time * 1000L;
 
         String timeZone = Config.getConfig().getString("time-zone");
 
@@ -117,6 +117,8 @@ public class Util {
             case "GMT+12":
                 timeZone = "Pacific/Fiji";
                 break;
+            case null:
+                break;
             default:
                 timeZone = "Europe/Moscow";
                 break;
@@ -124,144 +126,177 @@ public class Util {
 
 
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
-        a += calendar.getTime().getTime()+calendar.getTimeZone().getRawOffset();
-        return format.format(a);
+        milliseconds += calendar.getTime().getTime() + calendar.getTimeZone().getRawOffset();
+        return format.format(milliseconds);
     }
 
-    public static void fillInventory(Inventory inv, List<String> countdown, List<String> unlim, List<String> lim, Player p) {
+    public static void fillInventory(Inventory inv, Player player, PrimeSeller plugin) {
         MapBase sql = new MapBase();
+        UUID playerId = player.getUniqueId();
+        List<Component> unlim = new ArrayList<>();
+        List<Component> lim = new ArrayList<>();
+        List<Component> countdown = new ArrayList<>();
         for (Map.Entry<Integer, SellItem> entry : MapBase.database.entrySet()) {
             int next = entry.getKey();
             ItemStack item = entry.getValue().getItem().clone();
             if (sql.isLimited(next)) {
                 double price = sql.getPrice(next);
-                String price64 = format.format(price*64).replace(",", ".");
-                String priceall = format.format(Util.calc(p, item)*price).replace(",", ".");
-                for (String s : Menu.getConfig().getStringList("lim-items.lore")) {
-                    lim.add(Chat.color(s
-                            .replace("%price-x1%", format.format(price).replace(",", "."))
+                String price64 = EconomyManager.format(price * 64);
+                String priceall = EconomyManager.format(Util.calc(player, item) * price);
+                for (String s : Config.getMenuConfig().getStringList("lim-items.lore")) {
+                    lim.add(Chat.toComponent(s
+                            .replace("%price-x1%", EconomyManager.format(price))
                             .replace("%price-x64%", price64)
                             .replace("%price-all%", priceall)
-                            .replace("%sell%", String.valueOf(Util.playerSellItems.get(p.getUniqueId())))
+                            .replace("%sell%", String.valueOf(Util.playerSellItems.get(playerId)))
                             .replace("%max%", String.valueOf(Items.getConfig().getInt("limited.limit")))
-                            .replace("%sell-items%", String.valueOf(sql.getSlot(next).getPlayerItemLimit(p))))
-                            .replace("%max-items%", String.valueOf(Items.getConfig().getInt("limited.limit-per-items"))));
+                            .replace("%sell-items%", String.valueOf(sql.getSlot(next).getPlayerItemLimit(player)))
+                            .replace("%max-items%", String.valueOf(Items.getConfig().getInt("limited.limit-per-items")
+                            ))));
                 }
                 ItemMeta meta = item.getItemMeta();
-                if(meta != null) meta.setLore(lim);
+                if (meta != null) {
+                    meta.lore(lim);
+                    meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                }
                 item.setItemMeta(meta);
                 inv.setItem(next, item);
                 lim.clear();
                 continue;
             }
             double price = sql.getPrice(next);
-            String price64 = format.format(price*64).replace(",", ".");
-            String priceall = format.format(Util.calc(p, item)*price).replace(",", ".");
-            for (String s : Menu.getConfig().getStringList("unlim-items.lore")) {
-                unlim.add(Chat.color(s
-                        .replace("%price-x1%", format.format(price).replace(",", "."))
+            String price64 = EconomyManager.format(price * 64);
+            String priceall = EconomyManager.format(Util.calc(player, item) * price);
+            for (String s : Config.getMenuConfig().getStringList("unlim-items.lore")) {
+                unlim.add(Chat.toComponent(s
+                        .replace("%price-x1%", EconomyManager.format(price))
                         .replace("%price-all%", priceall)
                         .replace("%price-x64%", price64)));
             }
             ItemMeta meta = item.getItemMeta();
-            if(meta != null) meta.setLore(unlim);
+            if (meta != null) {
+                meta.lore(unlim);
+                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            }
+            ;
             item.setItemMeta(meta);
             inv.setItem(next, item);
             unlim.clear();
         }
-
-        for(String s : Menu.getConfig().getConfigurationSection("divider").getKeys(false)) {
-            for (Integer i : Menu.getConfig().getIntegerList("divider."+s+".slots")) {
-                String items = Menu.getConfig().getString("divider."+s+".material");
-                List<String> lore = Menu.getConfig().getStringList("divider."+s+".lore");
-                int modelId = Menu.getConfig().getInt("divider."+s+".model-data",0);
+        for (Integer i : Config.getMenuConfig().getIntegerList("exit.slots")) {
+            String items = Config.getMenuConfig().getString("exit.material");
+            List<Component> lore = Config.getMenuConfig().getStringList("exit.lore").stream()
+                    .map(Chat::toComponent)
+                    .toList();
+            ItemStack item;
+            try {
+                item = new ItemStack(Material.valueOf(items));
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Unknown object: " + items);
+                break;
+            }
+            ItemMeta meta = item.getItemMeta();
+            meta.lore(lore);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.displayName(Chat.toComponent(Config.getMenuConfig().getString("exit.name", "exit")));
+            item.setItemMeta(meta);
+            inv.setItem(i, item);
+        }
+        for (Integer i : Config.getMenuConfig().getIntegerList("sell-inventory.slots")) {
+            String items = Config.getMenuConfig().getString("sell-inventory.material");
+            List<Component> lore = Config.getMenuConfig().getStringList("sell-inventory.lore").stream()
+                    .map(Chat::toComponent)
+                    .toList();
+            ItemStack item;
+            try {
+                item = new ItemStack(Material.valueOf(items));
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Unknown object: " + items);
+                break;
+            }
+            ItemMeta meta = item.getItemMeta();
+            meta.lore(lore);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.displayName(Chat.toComponent(Config.getMenuConfig().getString("sell-inventory.name", "sell_inventory")));
+            item.setItemMeta(meta);
+            inv.setItem(i, item);
+        }
+        for (Integer i : Config.getMenuConfig().getIntegerList("countdown.slots")) {
+            String material = Config.getMenuConfig().getString("countdown.material");
+            ItemStack item = new ItemStack(Material.BARRIER);
+            if (material != null) {
+                if (material.startsWith("basehead-")) {
+                    String url = material.replace("basehead-", "");
+                    item = Util.getSkull(url);
+                } else {
+                    item = new ItemStack(Material.valueOf(material));
+                }
+            }
+            ItemMeta meta = item.getItemMeta();
+            for (String s : Config.getMenuConfig().getStringList("countdown.lore")) {
+                countdown.add(Chat.toComponent(s
+                        .replace("%lim-time%", Updater.getLimitedTime())
+                        .replace("%unlim-time%", Updater.getUnLimitedTime())
+                        .replace("%lim-time-format%", Util.limitedFormat)
+                        .replace("%unlim-time-format%", Util.unlimitedFormat)));
+            }
+            meta.lore(countdown);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.displayName(Chat.toComponent(Config.getMenuConfig().getString("countdown.name", "countdown")));
+            item.setItemMeta(meta);
+            inv.setItem(i, item);
+            countdown.clear();
+        }
+        if (player.hasPermission("primeseller.autoseller")) {
+            for (Integer i : Config.getMenuConfig().getIntegerList("autosell.slots")) {
+                String items = Config.getMenuConfig().getString("autosell.material");
+                List<Component> lore = Config.getMenuConfig().getStringList("autosell.lore").stream()
+                        .map(line -> line
+                                .replace("%autosell-slots%", String.valueOf(AutoSellManager.getAutoSellMaterials(player).size()))
+                                .replace("%autosell-max-slots%", String.valueOf(AutoSellManager.getMaxAutoSellSlots(player))))
+                        .map(Chat::toComponent)
+                        .toList();
                 ItemStack item;
                 try {
                     item = new ItemStack(Material.valueOf(items));
                 } catch (IllegalArgumentException e) {
-                    Bukkit.getLogger().warning("Неизвестный предмет: " + items);
-                    continue;
+                    plugin.getLogger().warning("Unknown object: " + items);
+                    break;
                 }
-                lore.forEach(Chat::color);
                 ItemMeta meta = item.getItemMeta();
-                meta.setCustomModelData(modelId);
-                meta.setLore(lore);
-                meta.setDisplayName(Chat.color(Menu.getConfig().getString("divider."+s+".name")));
+                meta.lore(lore);
+                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                meta.displayName(Chat.toComponent(Config.getMenuConfig().getString("autosell.name", "autosell")));
                 item.setItemMeta(meta);
                 inv.setItem(i, item);
             }
         }
-        for (Integer i : Menu.getConfig().getIntegerList("exit.slots")) {
-            String items = Menu.getConfig().getString("exit.material");
-            List<String> lore = Menu.getConfig().getStringList("exit.lore");
-            int modelId = Menu.getConfig().getInt("exit.model-data",0);
+        for (int i = 0; i < inv.getSize(); i++) {
+            if (inv.getItem(i) != null) continue;
+
+            String items = Config.getMenuConfig().getString("divider.material");
+            List<Component> lore = Config.getMenuConfig().getStringList("divider.lore").stream()
+                    .map(Chat::toComponent)
+                    .toList();
             ItemStack item;
             try {
                 item = new ItemStack(Material.valueOf(items));
             } catch (IllegalArgumentException e) {
-                Bukkit.getLogger().warning("Неизвестный предмет: " + items);
-                break;
-            }
-            lore.forEach(Chat::color);
-            ItemMeta meta = item.getItemMeta();
-            meta.setLore(lore);
-            meta.setCustomModelData(modelId);
-            meta.setDisplayName(Chat.color(Menu.getConfig().getString("exit.name")));
-            item.setItemMeta(meta);
-            inv.setItem(i, item);
-        }
-        for (Integer i : Menu.getConfig().getIntegerList("sell-inventory.slots")) {
-            String items = Menu.getConfig().getString("sell-inventory.material");
-            List<String> lore = Menu.getConfig().getStringList("sell-inventory.lore");
-            int modelId = Menu.getConfig().getInt("sell-inventory.model-data",0);
-            ItemStack item;
-            try {
-                item = new ItemStack(Material.valueOf(items));
-            } catch (IllegalArgumentException e) {
-                Bukkit.getLogger().warning("Неизвестный предмет: " + items);
-                break;
-            }
-            lore.forEach(Chat::color);
-            ItemMeta meta = item.getItemMeta();
-            meta.setLore(lore);
-            meta.setCustomModelData(modelId);
-            meta.setDisplayName(Chat.color(Menu.getConfig().getString("sell-inventory.name")));
-            item.setItemMeta(meta);
-            inv.setItem(i, item);
-        }
-        for (Integer i : Menu.getConfig().getIntegerList("countdown.slots")) {
-            String name = Menu.getConfig().getString("countdown.material");
-            int modelId = Menu.getConfig().getInt("countdown.model-data",0);
-            ItemStack item = new ItemStack(Material.BARRIER);
-            if(name != null) {
-                if (name.startsWith("basehead-")) {
-                    String url = name.replace("basehead-", "");
-                    item = Util.getSkull(url);
-                } else {
-                    item = new ItemStack(Material.valueOf(name));
-                }
+                plugin.getLogger().warning("Unknown object: " + items);
+                continue;
             }
             ItemMeta meta = item.getItemMeta();
-            for (String s : Menu.getConfig().getStringList("countdown.lore")) {
-                countdown.add(Chat.color(s
-                        .replace("%lim-time%", Updater.getLimitedTime(2))
-                        .replace("%unlim-time%", Updater.getUnLimitedTime(2))
-                        .replace("%lim-time-format%", limitedFormat)
-                        .replace("%unlim-time-format%", unlimitedFormat)));
-            }
-            meta.setLore(countdown);
-            meta.setCustomModelData(modelId);
-            name = Menu.getConfig().getString("countdown.name");
-            meta.setDisplayName(Chat.color(name));
+            meta.lore(lore);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.displayName(Chat.toComponent(Config.getMenuConfig().getString("divider.name", "divider")));
             item.setItemMeta(meta);
             inv.setItem(i, item);
-            countdown.clear();
         }
     }
 
     public static int calc(Player p, ItemStack s) {
         int count = 0;
-        for(int i = 0; i < p.getInventory().getSize(); ++i) {
+        for (int i = 0; i < p.getInventory().getSize(); ++i) {
             if (i != 40 && i != 38 && i != 37 && i != 36 && i != 39) {
                 ItemStack stack = p.getInventory().getItem(i);
                 if (stack != null && stack.isSimilar(s)) {
@@ -272,79 +307,24 @@ public class Util {
         return count;
     }
 
-    private static SkinData decodeBase64(String url) {
-        String json = new String(Base64.getDecoder().decode(url));
+    public static ItemStack getSkull(String base64Texture) {
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) skull.getItemMeta();
 
-        Gson gson = new Gson();
-
-        return gson.fromJson(json, SkinData.class);
-    }
-
-    public static ItemStack getSkull(String url) {
-        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
-        if(ServerVersionUtil.getServerVersion().getMinor() <= 12) {
-            item = new ItemStack(Material.valueOf("HEAD"));
-        }
-        SkullMeta meta = (SkullMeta) item.getItemMeta();
-        if (ServerVersionUtil.getServerVersion().getMinor() >= 18) {
-            PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID());
-            PlayerTextures textures = profile.getTextures();
-            SkinData data = decodeBase64(url);
+        if (meta != null) {
             try {
-                URL skinUrl = URI.create(data.getTextures().getSkin().getUrl()).toURL();
-                textures.setSkin(skinUrl);
-            } catch (MalformedURLException e) {
-                Bukkit.getLogger().severe("[PrimeSeller] Произошла ошибка при обработке текстуры головы.");
-                Bukkit.getLogger().severe(data.getTextures().getSkin().getUrl());
-                return item;
-            }
-            profile.setTextures(textures);
-            meta.setOwnerProfile(profile);
-            item.setItemMeta(meta);
-        } else {
-            GameProfile profile = new GameProfile(UUID.randomUUID(), "byteswing");
-            profile.getProperties().put("textures", new Property("textures", url));
+                PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID(), null);
+                ProfileProperty property = new ProfileProperty("textures", base64Texture);
+                profile.setProperty(property);
 
-            try {
-                Field profileField = meta.getClass().getDeclaredField("profile");
-                profileField.setAccessible(true);
-                profileField.set(meta, profile);
-            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException var6) {
-                var6.printStackTrace();
+                meta.setPlayerProfile(profile);
+            } catch (Exception ignored) {
+                // Если не удалось установить текстуру, оставляем обычную голову
             }
 
-            item.setItemMeta(meta);
+            skull.setItemMeta(meta);
         }
-        return item;
+
+        return skull;
     }
-
-    /*public static String getCountry() throws IOException {
-        List<String> list = new ArrayList<>();
-        URL oracle = new URL("http://www.geoplugin.net/xml.gp?ip=xx.xx.xx.xx");
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(oracle.openStream()));
-
-        String inputLine;
-        while ((inputLine = in.readLine()) != null)
-            list.add(inputLine);
-
-        String s = list.get(13).replace("\t<geoplugin_countryName>", "").replace("</geoplugin_countryName>", "");
-        in.close();
-        return s;
-    }
-    public static String getCountry(String ip) throws IOException {
-        List<String> list = new ArrayList<>();
-        URL oracle = new URL("http://www.geoplugin.net/xml.gp?ip="+ip);
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(oracle.openStream()));
-
-        String inputLine;
-        while ((inputLine = in.readLine()) != null)
-            list.add(inputLine);
-
-        String s = list.get(13).replace("\t<geoplugin_countryName>", "").replace("</geoplugin_countryName>", "");
-        in.close();
-        return s;
-    }*/
-
 }

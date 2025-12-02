@@ -1,10 +1,13 @@
 package me.byteswing.primeseller.commands;
 
+import me.byteswing.primeseller.managers.EconomyManager;
+import me.byteswing.primeseller.managers.LanguageManager;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import me.byteswing.primeseller.PrimeSeller;
 import me.byteswing.primeseller.configurations.Config;
 import me.byteswing.primeseller.configurations.Items;
@@ -13,81 +16,116 @@ import me.byteswing.primeseller.util.Chat;
 import me.byteswing.primeseller.util.Updater;
 
 public class PrimeSellerCommands implements CommandExecutor {
+    private final PrimeSeller plugin;
 
     public PrimeSellerCommands(PrimeSeller main) {
-        main.getCommand("PrimeSeller").setExecutor(this);
+        this.plugin = main;
+        main.getCommand("primeseller").setExecutor(this);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!sender.hasPermission("primeseller.admin")) {
-            Chat.sendMessage(sender, Config.getConfig().getString("messages.commands.permission"));
+        if (!sender.hasPermission("primeseller.admin")) {
+            Chat.sendMessage(sender, Config.getMessage("commands.permission"));
             return true;
         }
-        if(args.length < 1) {
-            Chat.sendMessage(sender, Config.getConfig().getString("messages.commands.update-use"));
+
+        if (args.length == 0) {
+            Chat.sendMessage(sender, Config.getMessage("commands.update-use"));
             return true;
         }
-        if(args[0].equalsIgnoreCase("update")) {
-            Updater.update();
-            Chat.sendMessage(sender, Config.getConfig().getString("messages.commands.update"));
-            return true;
-        } else if(args[0].equalsIgnoreCase("reload")) {
-            ConfigManager.reloadConfigurations();
-            Chat.sendMessage(sender, Config.getConfig().getString("messages.commands.reload"));
+
+        String subCommand = args[0].toLowerCase();
+
+        switch (subCommand) {
+            case "update":
+                if (args.length > 1) {
+                    switch (args[1].toLowerCase()) {
+                        case "limited":
+                            Updater.clearAndCreateLimited(plugin, true);
+                            Chat.sendMessage(sender, Config.getMessage("commands.update-lim"));
+                            return true;
+                        case "unlimited":
+                            Updater.clearAndCreateUnLimited(plugin, true);
+                            Chat.sendMessage(sender, Config.getMessage("commands.update-unlim"));
+                            return true;
+                        default:
+                            Chat.sendMessage(sender, Config.getMessage("commands.update-usage"));
+                            return true;
+                    }
+                } else {
+                    Updater.update(plugin);
+                    Chat.sendMessage(sender, Config.getMessage("commands.update"));
+                    return true;
+                }
+            case "reload":
+                reloadConfig();
+                Chat.sendMessage(sender, Config.getMessage("commands.reload"));
+                return true;
+        }
+
+        if (!(sender instanceof Player player)) {
+            Chat.sendMessage(sender, Config.getMessage("commands.player-only"));
             return true;
         }
-        if(!(sender instanceof Player)) {
-            sender.sendMessage("Только для игроков!");
-            return true;
-        }
-        Player p = (Player) sender;
+
+        return handleItemCommands(player, subCommand, args);
+    }
+
+    private boolean handleItemCommands(Player player, String subCommand, String[] args) {
         if (args.length < 3) {
-            Chat.sendMessage(p, Config.getConfig().getString("messages.commands.addlimited-use"));
-            Chat.sendMessage(p, Config.getConfig().getString("messages.commands.addunlimited-use"));
+            sendUsageMessages(player);
             return true;
         }
-        if(args[0].equalsIgnoreCase("addlimited")) {
-            if(p.getInventory().getItemInMainHand().getType() == Material.AIR) {
-                Chat.sendMessage(p, "&fНельзя добавить &cничего&f в список скупаемых предметов.");
-                return true;
-            }
-            double min;
-            double max;
-            try {
-                min = Double.parseDouble(args[1]);
-                max = Double.parseDouble(args[2]);
-            } catch (NumberFormatException e) {
-                Chat.sendMessage(p, "&cВведите правильное число.");
-                return true;
-            }
-            Items.addItem(p.getInventory().getItemInMainHand(), min, max, true);
-            Chat.sendMessage(p, Config.getConfig().getString("messages.commands.added")
-                    .replace("%item%", p.getInventory().getItemInMainHand().getType().toString())
-                    .replace("%min-price%", String.valueOf(min).replace(".", ","))
-                    .replace("%max-price%", String.valueOf(max).replace(".", ",")));
-        } else if(args[0].equalsIgnoreCase("addunlimited")) {
-            if(p.getInventory().getItemInMainHand().getType() == Material.AIR) {
-                Chat.sendMessage(p, "&fНельзя добавить &cничего&f в список скупаемых предметов.");
-                return true;
-            }
-            double min;
-            double max;
-            try {
-                min = Double.parseDouble(args[1]);
-                max = Double.parseDouble(args[2]);
-            } catch (NumberFormatException e) {
-                Chat.sendMessage(p, "&cВведите правильное число.");
-                return true;
-            }
-            Items.addItem(p.getInventory().getItemInMainHand(), min, max, false);
-            Chat.sendMessage(p, Config.getConfig().getString("messages.commands.added")
-                    .replace("%item%", p.getInventory().getItemInMainHand().getType().toString())
-                    .replace("%min-price%", String.valueOf(min).replace(".", ","))
-                    .replace("%max-price%", String.valueOf(max).replace(".", ",")));
-        } else {
-            Chat.sendMessage(p, Config.getConfig().getString("messages.commands.addunlimited-use"));
+
+        ItemStack handItem = player.getInventory().getItemInMainHand();
+        if (handItem.getType() == Material.AIR) {
+            String errorPath = subCommand.equals("addlimited")
+                    ? "commands.addlimited-error"
+                    : "commands.addunlimited-error";
+            Chat.sendMessage(player, Config.getMessage(errorPath));
+            return true;
         }
+
+        Double minPrice = parsePrice(args[1]);
+        Double maxPrice = parsePrice(args[2]);
+        if (minPrice == null || maxPrice == null) {
+            Chat.sendMessage(player, Config.getMessage("commands.not-number"));
+            return true;
+        }
+
+        boolean isLimited = subCommand.equals("addlimited");
+        Items.addItem(handItem, minPrice, maxPrice, isLimited);
+
+        sendAddedMessage(player, LanguageManager.translate(handItem.getType()), minPrice, maxPrice);
         return true;
+    }
+
+    private void reloadConfig() {
+        ConfigManager.reloadConfigurations();
+        LanguageManager.reload(plugin);
+        EconomyManager.reload();
+        Chat.init(plugin);
+    }
+
+    private Double parsePrice(String priceStr) {
+        try {
+            return Double.parseDouble(priceStr);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private void sendUsageMessages(Player player) {
+        Chat.sendMessage(player, Config.getMessage("commands.addlimited-use"));
+        Chat.sendMessage(player, Config.getMessage("commands.addunlimited-use"));
+    }
+
+    private void sendAddedMessage(Player player, String itemName, double minPrice, double maxPrice) {
+        String message = Config.getMessage("commands.added")
+                .replace("%item%", itemName)
+                .replace("%min-price%", EconomyManager.format(minPrice))
+                .replace("%max-price%", EconomyManager.format(maxPrice));
+        Chat.sendMessage(player, message);
     }
 }
