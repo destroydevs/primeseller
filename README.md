@@ -2,7 +2,7 @@
 PrimeSeller is an indispensable tool for any Minecraft server aiming to create a dynamic and balanced economy. With its help, players can easily and conveniently sell their items, and administrators can control the game's economy.
 
 ## Features: 
-1. HEX-colors support 
+1. [MiniMessages-formats](https://docs.papermc.io/adventure/minimessage/format/) support 
 2. Full itemstack support 
 3. Fully customizable 
 4. Easy to use 
@@ -13,8 +13,8 @@ PrimeSeller is an indispensable tool for any Minecraft server aiming to create a
 9. Fully configurable 
 10. Ability to sell the entire inventory 
 11. Limited and unlimited buyer 
-12. Intuitive for players 
-13. Supports all Minecraft versions 1.13+
+12. Intuitive for players
+13. Auto Seller
 14. [Pumpkin](https://github.com/Pumpkin-MC/Pumpkin) support in future.
 
 # Plugin Installation
@@ -29,18 +29,24 @@ PrimeSeller is an indispensable tool for any Minecraft server aiming to create a
 3. Start the server
 
 ## Requirements
-- Server versions: Paper, Spigot, Folia, or their forks (1.13+)
-- Java: 17+
-- Dependencies: (only Vault)
+- Server versions: Paper 21.8
+- Java: 21+
+- Dependencies: 
+  1) Required: Vault or CoinsEngine
+  2) Optional: PlaceholderAPI
 
 ## Usage
+Permission `primeseller.user` gives players permissions: `primeseller.seller` and `primeseller.autoseller`
 Commands:
 
-> without permissions (configurable)
+> Permission - primeseller.seller
 - /seller 
 
+> Permission - primeseller.autoseller
+- /autoseller
+
 > Permission - primeseller.admin 
-- /seller update
+- /seller update [limited|unlimited]
 - /seller addunlimited
 - /seller addlimited
 - /seller reload
