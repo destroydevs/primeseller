@@ -83,11 +83,11 @@ public class Updater {
                 Util.playerSellItems.put(p.getUniqueId(), 0);
             }
 
+            AutoSellManager.resetAllLimitedStats();
             MapBase sql = new MapBase();
             sql.clearLimited();
 
             Understating.resetCounters();
-            AutoSellManager.resetAllStats();
 
             Util.limitedFormat = Util.formattedTime(Items.getConfig().getInt("limited.update"));
 
@@ -114,6 +114,7 @@ public class Updater {
             counter.put("unlimited", Items.getConfig().getInt("unlimited.update"));
             Util.update = true;
 
+            AutoSellManager.resetAllUnlimitedStats();
             MapBase sql = new MapBase();
             sql.clearUnLimited();
 
