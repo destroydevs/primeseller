@@ -1,0 +1,330 @@
+package me.byteswing.primeseller.util;
+
+import com.destroystokyo.paper.profile.ProfileProperty;
+import me.byteswing.primeseller.PrimeSeller;
+import me.byteswing.primeseller.configurations.Config;
+import me.byteswing.primeseller.configurations.Items;
+import me.byteswing.primeseller.configurations.database.MapBase;
+import me.byteswing.primeseller.configurations.database.SellItem;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import me.byteswing.primeseller.managers.AutoSellManager;
+import me.byteswing.primeseller.managers.EconomyManager;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+public class Util {
+
+    public static boolean update = false;
+
+    public static HashMap<UUID, Integer> playerSellItems = new HashMap<>();
+
+    public static String limitedFormat = "Loading...";
+    public static String unlimitedFormat = "Loading...";
+
+    public static String formattedTime(int time) {
+        String defaultFormat = "yy-MM-dd HH:mm";
+        String fmt = Config.getConfig().getString("datetime-format", defaultFormat);
+        SimpleDateFormat format;
+        try {
+            format = new SimpleDateFormat(fmt);
+        } catch (IllegalArgumentException ex) {
+            format = new SimpleDateFormat(defaultFormat);
+        }
+        long milliseconds = time * 1000L;
+
+        String timeZone = Config.getConfig().getString("time-zone");
+
+        switch (timeZone) {
+            case "GMT+2":
+                timeZone = "Europe/Paris";
+                break;
+            case "GMT+1":
+                timeZone = "Europe/London";
+                break;
+            case "GMT+0":
+                timeZone = "UTC";
+                break;
+            case "GMT-1":
+                timeZone = "Atlantic/Azores";
+                break;
+            case "GMT-2":
+                timeZone = "America/Noronha";
+                break;
+            case "GMT-3":
+                timeZone = "America/Argentina/Buenos_Aires";
+                break;
+            case "GMT-4":
+                timeZone = "America/La_Paz";
+                break;
+            case "GMT-5":
+                timeZone = "America/New_York";
+                break;
+            case "GMT-6":
+                timeZone = "America/Chicago";
+                break;
+            case "GMT-7":
+                timeZone = "America/Denver";
+                break;
+            case "GMT-8":
+                timeZone = "America/Los_Angeles";
+                break;
+            case "GMT-9":
+                timeZone = "America/Anchorage";
+                break;
+            case "GMT-10":
+                timeZone = "Pacific/Honolulu";
+                break;
+            case "GMT-11":
+                timeZone = "Pacific/Midway";
+                break;
+            case "GMT-12":
+                timeZone = "Pacific/Kwajalein";
+                break;
+            case "GMT+4":
+                timeZone = "Asia/Dubai";
+                break;
+            case "GMT+5":
+                timeZone = "Asia/Karachi";
+                break;
+            case "GMT+6":
+                timeZone = "Asia/Dhaka";
+                break;
+            case "GMT+7":
+                timeZone = "Asia/Bangkok";
+                break;
+            case "GMT+8":
+                timeZone = "Asia/Shanghai";
+                break;
+            case "GMT+9":
+                timeZone = "Asia/Tokyo";
+                break;
+            case "GMT+10":
+                timeZone = "Australia/Sydney";
+                break;
+            case "GMT+11":
+                timeZone = "Pacific/Guadalcanal";
+                break;
+            case "GMT+12":
+                timeZone = "Pacific/Fiji";
+                break;
+            case null:
+                break;
+            default:
+                timeZone = "Europe/Moscow";
+                break;
+        }
+
+
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+        milliseconds += calendar.getTime().getTime() + calendar.getTimeZone().getRawOffset();
+        return format.format(milliseconds);
+    }
+
+    public static void fillInventory(Inventory inv, Player player, PrimeSeller plugin) {
+        MapBase sql = new MapBase();
+        UUID playerId = player.getUniqueId();
+        List<Component> unlim = new ArrayList<>();
+        List<Component> lim = new ArrayList<>();
+        List<Component> countdown = new ArrayList<>();
+        for (Map.Entry<Integer, SellItem> entry : MapBase.database.entrySet()) {
+            int next = entry.getKey();
+            ItemStack item = entry.getValue().getItem().clone();
+            if (sql.isLimited(next)) {
+                double price = sql.getPrice(next);
+                String price64 = EconomyManager.format(price * 64);
+                String priceall = EconomyManager.format(Util.calc(player, item) * price);
+                for (String s : Config.getMenuConfig().getStringList("lim-items.lore")) {
+                    lim.add(Chat.toComponent(s
+                            .replace("%price-x1%", EconomyManager.format(price))
+                            .replace("%price-x64%", price64)
+                            .replace("%price-all%", priceall)
+                            .replace("%sell%", String.valueOf(Util.playerSellItems.get(playerId)))
+                            .replace("%max%", String.valueOf(Items.getConfig().getInt("limited.limit")))
+                            .replace("%sell-items%", String.valueOf(sql.getSlot(next).getPlayerItemLimit(player)))
+                            .replace("%max-items%", String.valueOf(Items.getConfig().getInt("limited.limit-per-items")
+                            ))));
+                }
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    meta.lore(lim);
+                    meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                }
+                item.setItemMeta(meta);
+                inv.setItem(next, item);
+                lim.clear();
+                continue;
+            }
+            double price = sql.getPrice(next);
+            String price64 = EconomyManager.format(price * 64);
+            String priceall = EconomyManager.format(Util.calc(player, item) * price);
+            for (String s : Config.getMenuConfig().getStringList("unlim-items.lore")) {
+                unlim.add(Chat.toComponent(s
+                        .replace("%price-x1%", EconomyManager.format(price))
+                        .replace("%price-all%", priceall)
+                        .replace("%price-x64%", price64)));
+            }
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                meta.lore(unlim);
+                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            }
+            ;
+            item.setItemMeta(meta);
+            inv.setItem(next, item);
+            unlim.clear();
+        }
+        for (Integer i : Config.getMenuConfig().getIntegerList("exit.slots")) {
+            String items = Config.getMenuConfig().getString("exit.material");
+            List<Component> lore = Config.getMenuConfig().getStringList("exit.lore").stream()
+                    .map(Chat::toComponent)
+                    .toList();
+            ItemStack item;
+            try {
+                item = new ItemStack(Material.valueOf(items));
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Unknown object: " + items);
+                break;
+            }
+            ItemMeta meta = item.getItemMeta();
+            meta.lore(lore);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.displayName(Chat.toComponent(Config.getMenuConfig().getString("exit.name", "exit")));
+            item.setItemMeta(meta);
+            inv.setItem(i, item);
+        }
+        for (Integer i : Config.getMenuConfig().getIntegerList("sell-inventory.slots")) {
+            String items = Config.getMenuConfig().getString("sell-inventory.material");
+            List<Component> lore = Config.getMenuConfig().getStringList("sell-inventory.lore").stream()
+                    .map(Chat::toComponent)
+                    .toList();
+            ItemStack item;
+            try {
+                item = new ItemStack(Material.valueOf(items));
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Unknown object: " + items);
+                break;
+            }
+            ItemMeta meta = item.getItemMeta();
+            meta.lore(lore);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.displayName(Chat.toComponent(Config.getMenuConfig().getString("sell-inventory.name", "sell_inventory")));
+            item.setItemMeta(meta);
+            inv.setItem(i, item);
+        }
+        for (Integer i : Config.getMenuConfig().getIntegerList("countdown.slots")) {
+            String material = Config.getMenuConfig().getString("countdown.material");
+            ItemStack item = new ItemStack(Material.BARRIER);
+            if (material != null) {
+                if (material.startsWith("basehead-")) {
+                    String url = material.replace("basehead-", "");
+                    item = Util.getSkull(url);
+                } else {
+                    item = new ItemStack(Material.valueOf(material));
+                }
+            }
+            ItemMeta meta = item.getItemMeta();
+            for (String s : Config.getMenuConfig().getStringList("countdown.lore")) {
+                countdown.add(Chat.toComponent(s
+                        .replace("%lim-time%", Updater.getLimitedTime())
+                        .replace("%unlim-time%", Updater.getUnLimitedTime())
+                        .replace("%lim-time-format%", Util.limitedFormat)
+                        .replace("%unlim-time-format%", Util.unlimitedFormat)));
+            }
+            meta.lore(countdown);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.displayName(Chat.toComponent(Config.getMenuConfig().getString("countdown.name", "countdown")));
+            item.setItemMeta(meta);
+            inv.setItem(i, item);
+            countdown.clear();
+        }
+        if (player.hasPermission("primeseller.autoseller")) {
+            for (Integer i : Config.getMenuConfig().getIntegerList("autosell.slots")) {
+                String items = Config.getMenuConfig().getString("autosell.material");
+                List<Component> lore = Config.getMenuConfig().getStringList("autosell.lore").stream()
+                        .map(line -> line
+                                .replace("%autosell-slots%", String.valueOf(AutoSellManager.getAutoSellMaterials(player).size()))
+                                .replace("%autosell-max-slots%", String.valueOf(AutoSellManager.getMaxAutoSellSlots(player))))
+                        .map(Chat::toComponent)
+                        .toList();
+                ItemStack item;
+                try {
+                    item = new ItemStack(Material.valueOf(items));
+                } catch (IllegalArgumentException e) {
+                    plugin.getLogger().warning("Unknown object: " + items);
+                    break;
+                }
+                ItemMeta meta = item.getItemMeta();
+                meta.lore(lore);
+                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                meta.displayName(Chat.toComponent(Config.getMenuConfig().getString("autosell.name", "autosell")));
+                item.setItemMeta(meta);
+                inv.setItem(i, item);
+            }
+        }
+        for (int i = 0; i < inv.getSize(); i++) {
+            if (inv.getItem(i) != null) continue;
+
+            String items = Config.getMenuConfig().getString("divider.material");
+            List<Component> lore = Config.getMenuConfig().getStringList("divider.lore").stream()
+                    .map(Chat::toComponent)
+                    .toList();
+            ItemStack item;
+            try {
+                item = new ItemStack(Material.valueOf(items));
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Unknown object: " + items);
+                continue;
+            }
+            ItemMeta meta = item.getItemMeta();
+            meta.lore(lore);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            meta.displayName(Chat.toComponent(Config.getMenuConfig().getString("divider.name", "divider")));
+            item.setItemMeta(meta);
+            inv.setItem(i, item);
+        }
+    }
+
+    public static int calc(Player p, ItemStack s) {
+        int count = 0;
+        for (int i = 0; i < p.getInventory().getSize(); ++i) {
+            if (i != 40 && i != 38 && i != 37 && i != 36 && i != 39) {
+                ItemStack stack = p.getInventory().getItem(i);
+                if (stack != null && stack.isSimilar(s)) {
+                    count += stack.getAmount();
+                }
+            }
+        }
+        return count;
+    }
+
+    public static ItemStack getSkull(String base64Texture) {
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) skull.getItemMeta();
+
+        if (meta != null) {
+            try {
+                PlayerProfile profile = Bukkit.createProfile(UUID.randomUUID(), null);
+                ProfileProperty property = new ProfileProperty("textures", base64Texture);
+                profile.setProperty(property);
+
+                meta.setPlayerProfile(profile);
+            } catch (Exception ignored) {
+                // Если не удалось установить текстуру, оставляем обычную голову
+            }
+
+            skull.setItemMeta(meta);
+        }
+
+        return skull;
+    }
+}
